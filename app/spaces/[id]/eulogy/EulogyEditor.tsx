@@ -52,7 +52,19 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
             </span>
           </label>
 
-          <div className="flex gap-3 flex-wrap mb-4">
+          <div className="flex gap-3 flex-wrap">
+            <form action={resetEulogy}>
+              <input type="hidden" name="eulogy_id" value={eulogyId} />
+              <input type="hidden" name="space_id" value={spaceId} />
+              <button
+                type="submit"
+                className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+                style={{ backgroundColor: '#FFF8F2' }}
+              >
+                Antwoorden aanpassen
+              </button>
+            </form>
+
             <form action={saveEulogyEdit}>
               <input type="hidden" name="eulogy_id" value={eulogyId} />
               <input type="hidden" name="space_id" value={spaceId} />
@@ -61,7 +73,7 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
                 type="submit"
                 className="px-5 py-2.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors"
               >
-                Opslaan
+                Sla wijzigingen op
               </button>
             </form>
 
@@ -90,14 +102,6 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
               </button>
             </form>
           </div>
-
-          <form action={resetEulogy}>
-            <input type="hidden" name="eulogy_id" value={eulogyId} />
-            <input type="hidden" name="space_id" value={spaceId} />
-            <button type="submit" className="text-xs text-stone-400 hover:text-stone-600 underline">
-              Antwoorden aanpassen en opnieuw genereren
-            </button>
-          </form>
         </div>
       )}
     </div>
