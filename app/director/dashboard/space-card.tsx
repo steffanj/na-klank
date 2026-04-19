@@ -48,7 +48,7 @@ export function SpaceCard({
       {confirming && (
         <div className="mt-4 pt-4 border-t border-red-200 flex items-center justify-between gap-4">
           <p className="text-sm font-bold text-red-700">
-            Weet u zeker dat u &ldquo;{name}&rdquo; permanent verwijdert?
+            Weet u zeker dat u &ldquo;{name}&rdquo; permanent wilt verwijderen?
           </p>
           <div className="flex items-center gap-4 shrink-0">
             <form action={async (fd) => { setPending(true); await deleteMemorialSpace(fd) }}>
