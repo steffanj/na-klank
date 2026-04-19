@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { saveEulogyEdit, regenerateEulogy, finalizeEulogy } from './actions'
+import { saveEulogyEdit, regenerateEulogy, finalizeEulogy, resetEulogy } from './actions'
 
 type Props = {
   eulogyId: string
@@ -52,7 +52,7 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
             </span>
           </label>
 
-          <div className="flex gap-3 flex-wrap">
+          <div className="flex gap-3 flex-wrap mb-4">
             <form action={saveEulogyEdit}>
               <input type="hidden" name="eulogy_id" value={eulogyId} />
               <input type="hidden" name="space_id" value={spaceId} />
@@ -90,6 +90,14 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
               </button>
             </form>
           </div>
+
+          <form action={resetEulogy}>
+            <input type="hidden" name="eulogy_id" value={eulogyId} />
+            <input type="hidden" name="space_id" value={spaceId} />
+            <button type="submit" className="text-xs text-stone-400 hover:text-stone-600 underline">
+              Antwoorden aanpassen en opnieuw genereren
+            </button>
+          </form>
         </div>
       )}
     </div>
