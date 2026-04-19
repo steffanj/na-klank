@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { DeleteSpaceButton } from './delete-space-button'
+import { SpaceCard } from './space-card'
 
 export default async function DirectorDashboard() {
   const supabase = await createClient()
@@ -52,24 +52,12 @@ export default async function DirectorDashboard() {
               ].filter(Boolean).join(' ')
 
               return (
-                <div key={space.id} className="border border-stone-300 rounded-xl px-6 py-5 transition-colors" style={{ backgroundColor: '#FFF8F2' }}>
-                  <div className="flex items-start justify-between">
-                    <a href={`/director/spaces/${space.id}`} className="flex-1 min-w-0">
-                      <p className="font-medium text-black text-lg">{name}</p>
-                      {space.funeral_date && (
-                        <p className="text-sm text-stone-500 mt-0.5">
-                          Uitvaart: {new Date(space.funeral_date).toLocaleDateString('nl-NL', {
-                            day: 'numeric', month: 'long', year: 'numeric'
-                          })}
-                        </p>
-                      )}
-                    </a>
-                    <div className="flex items-center gap-4 ml-4 shrink-0">
-                      <ContactBadge member={primaryContact} />
-                      <DeleteSpaceButton spaceId={space.id} spaceName={name} />
-                    </div>
-                  </div>
-                </div>
+                <SpaceCard
+                  key={space.id}
+                  space={space}
+                  name={name}
+                  primaryContact={primaryContact}
+                />
               )
             })}
           </div>
@@ -80,19 +68,3 @@ export default async function DirectorDashboard() {
 }
 
 type MemberRow = { role: string; invited_email: string; accepted_at: string | null }
-
-function ContactBadge({ member }: { member: MemberRow | undefined }) {
-  if (!member) return <span className="text-xs text-stone-300">Geen contact</span>
-  if (member.accepted_at) {
-    return (
-      <span className="text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-3 py-1">
-        Actief — {member.invited_email}
-      </span>
-    )
-  }
-  return (
-    <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-3 py-1">
-      Uitnodiging verstuurd — {member.invited_email}
-    </span>
-  )
-}
