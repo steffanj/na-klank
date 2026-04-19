@@ -15,7 +15,9 @@ export default async function DirectorDashboard() {
       memorial_space_members(role, invited_email, accepted_at)
     `)
     .eq('created_by', user.id)
-    .order('created_at', { ascending: false })
+    .order('funeral_date', { ascending: false, nullsFirst: false })
+    .order('deceased_last_name', { ascending: true })
+    .order('deceased_first_name', { ascending: true })
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#FFF1E5' }}>
