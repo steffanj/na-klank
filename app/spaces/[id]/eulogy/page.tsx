@@ -41,7 +41,7 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
             ← Terug
           </a>
           <div className="mb-8">
-            <h1 className="text-3xl text-black">Rouwbrief</h1>
+            <h1 className="text-3xl text-black">Afscheidswoord</h1>
             <p className="text-stone-500 text-sm mt-1">{fullName}</p>
           </div>
           {children}
@@ -54,7 +54,7 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
     return (
       <Shell>
         <p className="text-stone-600 text-sm mb-8">
-          Beantwoord een aantal vragen over {firstName}, en wij stellen een persoonlijke rouwbrief voor je op.
+          Beantwoord een aantal vragen over {firstName}, en wij stellen een persoonlijke afscheidswoord voor je op.
         </p>
         <form action={startEulogy.bind(null, id)}>
           <button

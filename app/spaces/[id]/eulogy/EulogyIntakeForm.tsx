@@ -65,7 +65,7 @@ export default function EulogyIntakeForm({ eulogyId, spaceId, firstName, savedAn
         type="submit"
         className="px-6 py-3 bg-stone-800 text-white text-sm rounded-lg hover:bg-stone-700 transition-colors"
       >
-        Stel rouwbrief op
+        Stel afscheidswoord op
       </button>
     </form>
   )

@@ -38,7 +38,7 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
 
       {finalized ? (
         <div className="flex items-center gap-4">
-          <p className="text-sm text-stone-400">Deze rouwbrief is afgerond.</p>
+          <p className="text-sm text-stone-400">Dit afscheidswoord is afgerond.</p>
           <form action={reopenEulogy} className="inline-flex items-center">
             <input type="hidden" name="eulogy_id" value={eulogyId} />
             <input type="hidden" name="space_id" value={spaceId} />
@@ -57,7 +57,7 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
               className="mt-0.5 shrink-0"
             />
             <span className="text-sm text-stone-600">
-              Deel mijn herinneringen voor de gezamenlijke rouwbrief
+              Deel mijn herinneringen voor het gezamenlijk afscheidswoord
             </span>
           </label>
 

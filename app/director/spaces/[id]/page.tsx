@@ -46,8 +46,8 @@ export default async function DirectorSpacePage({ params }: { params: Promise<{ 
           <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4">Modules</h2>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'Rouwbrief', href: `/spaces/${id}/eulogy` },
-              { label: 'Gezamenlijke rouwbrief', href: `/spaces/${id}/collective-eulogy` },
+              { label: 'Afscheidswoord', href: `/spaces/${id}/eulogy` },
+              { label: 'Gezamenlijk afscheidswoord', href: `/spaces/${id}/collective-eulogy` },
               { label: "Foto's", href: `/spaces/${id}/photo` },
               { label: 'Voorlezen', href: `/spaces/${id}/voice` },
             ].map(m => (

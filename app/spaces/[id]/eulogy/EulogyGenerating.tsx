@@ -48,7 +48,7 @@ export default function EulogyGenerating({ jobId, spaceId, eulogyId }: Props) {
           <div className="flex justify-center mb-5">
             <div className="w-8 h-8 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
           </div>
-          <p className="text-black mb-2">Rouwbrief wordt opgesteld…</p>
+          <p className="text-black mb-2">Afscheidswoord wordt opgesteld…</p>
           <p className="text-sm text-stone-400 mb-6">Dit kan een paar minuten duren.</p>
           <form action={resetEulogy}>
             <input type="hidden" name="eulogy_id" value={eulogyId} />

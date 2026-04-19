@@ -24,7 +24,7 @@ export async function startEulogy(spaceId: string) {
     .select('id')
     .single()
 
-  if (!eulogy) throw new Error('Kon rouwbrief niet starten.')
+  if (!eulogy) throw new Error('Kon afscheidswoord niet starten.')
 
   await supabase
     .from('eulogy_intakes')

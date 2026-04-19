@@ -4,13 +4,13 @@ import { redirect, notFound } from 'next/navigation'
 const MODULES = [
   {
     key: 'eulogy',
-    label: 'Rouwbrief',
+    label: 'Afscheidswoord',
     description: 'Verzamel persoonlijke herinneringen, en schrijf een persoonlijk eerbetoon, met begeleiding.',
     href: (id: string) => `/spaces/${id}/eulogy`,
   },
   {
     key: 'collective-eulogy',
-    label: 'Gezamenlijke rouwbrief',
+    label: 'Gezamenlijk afscheidswoord',
     description: 'Verzamel herinneringen van familie en vrienden, en laat een gemeenschappelijk eerbetoon opstellen.',
     href: (id: string) => `/spaces/${id}/collective-eulogy`,
   },
@@ -23,7 +23,7 @@ const MODULES = [
   {
     key: 'voice',
     label: 'Voorlezen',
-    description: 'Laat je rouwbrief voorlezen in een vertrouwde stem, of je eigen stem.',
+    description: 'Laat je afscheidswoord voorlezen in een vertrouwde stem, of je eigen stem.',
     href: (id: string) => `/spaces/${id}/voice`,
   },
 ]
