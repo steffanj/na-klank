@@ -1,13 +1,12 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { sendInvite } from '@/lib/email/invite'
 
 export async function addFamilyMember(formData: FormData) {
   const supabase = await createClient()
-  const admin = createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
@@ -24,7 +23,8 @@ export async function addFamilyMember(formData: FormData) {
     invited_by: user.id,
   })
 
-  await admin.auth.admin.inviteUserByEmail(email, {
+  await sendInvite({
+    email,
     redirectTo: `${process.env.APP_URL}/auth/callback?next=/spaces/${space_id}`,
   })
 

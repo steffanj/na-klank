@@ -5,25 +5,25 @@ const MODULES = [
   {
     key: 'eulogy',
     label: 'Rouwbrief',
-    description: 'Schrijf een persoonlijk eerbetoon met begeleiding.',
+    description: 'Verzamel persoonlijke herinneringen, en schrijf een persoonlijk eerbetoon, met begeleiding.',
     href: (id: string) => `/spaces/${id}/eulogy`,
   },
   {
     key: 'collective-eulogy',
     label: 'Gezamenlijke rouwbrief',
-    description: 'Verzamel herinneringen van familie en vrienden.',
+    description: 'Verzamel herinneringen van familie en vrienden, en laat een gemeenschappelijk eerbetoon opstellen.',
     href: (id: string) => `/spaces/${id}/collective-eulogy`,
   },
   {
     key: 'photo',
     label: "Foto's",
-    description: 'Herstel, kleur of vertaal foto\'s naar een kunstzinnige stijl.',
+    description: 'Upgrade de kwaliteit van oude foto\'s, laat zwart-wit-foto\'s inkleuren of vertaal foto\'s naar een kunstzinnige stijl.',
     href: (id: string) => `/spaces/${id}/photo`,
   },
   {
     key: 'voice',
     label: 'Voorlezen',
-    description: 'Laat de rouwbrief voorlezen in een vertrouwde stem.',
+    description: 'Laat je rouwbrief voorlezen in een vertrouwde stem, of je eigen stem.',
     href: (id: string) => `/spaces/${id}/voice`,
   },
 ]
@@ -49,32 +49,31 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
   ].filter(Boolean).join(' ')
 
   return (
-    <main className="min-h-screen bg-stone-50">
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        <div className="text-center mb-12">
-          <p className="text-stone-400 text-sm mb-2">In herinnering aan</p>
-          <h1 className="text-4xl font-serif text-stone-800">{name}</h1>
+    <main className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FFF1E5' }}>
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-10">
+          <p className="text-stone-500 text-sm mb-1">In herinnering aan</p>
+          <h1 className="text-3xl text-black">{name}</h1>
           {space.funeral_date && (
-            <p className="text-stone-400 text-sm mt-3">
-              Uitvaart op {new Date(space.funeral_date).toLocaleDateString('nl-NL', {
-                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            <p className="text-stone-500 text-sm mt-1">
+              Uitvaart: {new Date(space.funeral_date).toLocaleDateString('nl-NL', {
+                day: 'numeric', month: 'long', year: 'numeric'
               })}
             </p>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4">Modules</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {MODULES.map(module => (
             <a
               key={module.key}
               href={module.href(id)}
-              className="bg-white border border-stone-200 rounded-2xl px-6 py-6 hover:border-stone-300 hover:shadow-sm transition-all group"
+              className="border border-stone-300 rounded-xl px-5 py-4 hover:border-stone-400 transition-colors"
+              style={{ backgroundColor: '#FFF8F2' }}
             >
-              <h2 className="font-serif text-xl text-stone-800 mb-2 group-hover:text-stone-600 transition-colors">
-                {module.label}
-              </h2>
-              <p className="text-sm text-stone-400 leading-relaxed">{module.description}</p>
-              <p className="text-xs text-stone-300 mt-4">Nog niet gestart</p>
+              <p className="text-black">{module.label}</p>
+              <p className="text-xs text-stone-400 mt-1">{module.description}</p>
             </a>
           ))}
         </div>

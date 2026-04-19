@@ -1,12 +1,11 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
+import { sendInvite } from '@/lib/email/invite'
 
 export async function createMemorialSpace(formData: FormData) {
   const supabase = await createClient()
-  const admin = createAdminClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
@@ -48,9 +47,10 @@ export async function createMemorialSpace(formData: FormData) {
     invited_by: user.id,
   })
 
-  await admin.auth.admin.inviteUserByEmail(contact_email, {
+  await sendInvite({
+    email: contact_email,
+    name: contact_first_name,
     redirectTo: `${process.env.APP_URL}/auth/callback?next=/spaces/${space.id}`,
-    data: { display_name: contact_first_name },
   })
 
   redirect(`/director/spaces/${space.id}`)
