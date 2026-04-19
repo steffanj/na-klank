@@ -44,14 +44,7 @@ create table public.organizations (
 
 alter table public.organizations enable row level security;
 
-create policy "Org members can view their organization"
-  on public.organizations for select using (
-    exists (
-      select 1 from public.organization_members
-      where organization_id = organizations.id
-        and user_id = auth.uid()
-    )
-  );
+-- Policy added after organization_members is created (see below)
 
 -- ─────────────────────────────────────────
 -- ORGANIZATION MEMBERS
@@ -68,6 +61,16 @@ alter table public.organization_members enable row level security;
 
 create policy "Members can view their own membership"
   on public.organization_members for select using (user_id = auth.uid());
+
+-- Deferred org policy (requires organization_members to exist)
+create policy "Org members can view their organization"
+  on public.organizations for select using (
+    exists (
+      select 1 from public.organization_members
+      where organization_id = organizations.id
+        and user_id = auth.uid()
+    )
+  );
 
 -- ─────────────────────────────────────────
 -- MEMORIAL SPACES
