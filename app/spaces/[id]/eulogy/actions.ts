@@ -4,11 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-
-const INTAKE_KEYS = [
-  'relationship', 'in_few_words', 'best_memory', 'unique',
-  'life_lesson', 'passions', 'story', 'remember',
-]
+import { INTAKE_KEYS } from '@/lib/config/eulogy'
 
 function fireEdgeFunction(eulogyId: string, jobId: string) {
   const admin = createAdminClient()
