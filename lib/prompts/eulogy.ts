@@ -74,43 +74,50 @@ export function buildEulogyUserMessage(params: {
   answers: EulogyAnswers
 }): string {
   const { answers, firstName, fullName } = params
+  const lines: string[] = []
 
-  const lines: string[] = [
-    'Schrijf een persoonlijke rouwbrief op basis van de volgende informatie.\n',
-    'Over de overledene:',
-    `- Naam: ${fullName}`,
-  ]
-  if (params.age) lines.push(`- Leeftijd: ${params.age} jaar`)
-  if (params.profession) {
-    lines.push(`- Beroep: ${params.retired ? `${params.profession} (gepensioneerd)` : params.profession}`)
-  }
-  if (params.funeralDate) lines.push(`- Uitvaart: ${params.funeralDate}`)
+  lines.push('Schrijf een eulogie op basis van de onderstaande informatie. Alle ingevulde velden zijn door de spreker zelf aangeleverd en mogen letterlijk worden gebruikt als bouwstenen voor de tekst. Lege velden bestaan niet in deze input — wat hier staat, is alles wat je hebt.')
+  lines.push('')
 
-  lines.push('\nOver de schrijver en hun band met de overledene:')
-  if (answers.relationship) lines.push(`- Relatie: ${answers.relationship}`)
-  if (answers.nickname_used) lines.push(`- De schrijver noemde ${firstName} altijd: ${answers.nickname_used}`)
-  if (answers.significance) lines.push(`- Wat ${firstName} voor de schrijver betekende: ${answers.significance}`)
+  lines.push('## OVER DE OVERLEDENE')
+  lines.push(`Volledige naam: ${fullName}`)
+  lines.push(`Roepnaam (algemeen): ${firstName}`)
+  if (answers.nickname_used) lines.push(`Naam die de spreker altijd gebruikte: ${answers.nickname_used}`)
+  if (params.age) lines.push(`Leeftijd: ${params.age} jaar`)
+  if (params.profession) lines.push(`Beroep: ${params.retired ? `${params.profession}, gepensioneerd` : params.profession}`)
+  if (params.funeralDate) lines.push(`Datum uitvaart: ${params.funeralDate}`)
 
-  lines.push(`\nWie was ${firstName}?`)
-  if (answers.typical_trait) lines.push(`- Typisch voor ${firstName}: ${answers.typical_trait}`)
-  if (answers.mental_image) lines.push(`- Beeld dat de schrijver voor zich ziet: ${answers.mental_image}`)
-  if (answers.natural_habitat) lines.push(`- Waar ${firstName} zich het meest op zijn/haar plek voelde: ${answers.natural_habitat}`)
+  lines.push('')
+  lines.push('## OVER DE SPREKER EN HUN BAND')
+  if (answers.relationship) lines.push(`Relatie tot de overledene: ${answers.relationship}`)
+  if (answers.significance) lines.push(`Wat de overledene voor de spreker betekende: ${answers.significance}`)
 
-  lines.push('\nHerinneringen en verhalen:')
-  if (answers.best_memory) lines.push(`- Mooiste herinnering: ${answers.best_memory}`)
-  if (answers.story) lines.push(`- Bijzonder verhaal: ${answers.story}`)
-  if (answers.catchphrase) lines.push(`- Typische uitspraak van ${firstName}: ${answers.catchphrase}`)
+  lines.push('')
+  lines.push(`## WIE WAS ${firstName.toUpperCase()}?`)
+  if (answers.typical_trait) lines.push(`Wat typisch voor ${firstName} was (gebaar, gewoonte, uitdrukking): ${answers.typical_trait}`)
+  if (answers.mental_image) lines.push(`Het beeld dat de spreker voor zich ziet als hij/zij aan ${firstName} denkt: ${answers.mental_image}`)
+  if (answers.natural_habitat) lines.push(`Waar ${firstName} zich het meest op zijn/haar plek voelde: ${answers.natural_habitat}`)
 
-  lines.push(`\nWat ${firstName} achterlaat:`)
-  if (answers.life_lesson) lines.push(`- Wat de schrijver van ${firstName} heeft geleerd: ${answers.life_lesson}`)
-  if (answers.passions) lines.push(`- Passies en hobby's: ${answers.passions}`)
-  if (answers.remember) lines.push(`- Wat mensen nooit mogen vergeten: ${answers.remember}`)
+  lines.push('')
+  lines.push('## HERINNERINGEN EN VERHALEN')
+  if (answers.best_memory) lines.push(`Mooiste herinnering van de spreker: ${answers.best_memory}`)
+  if (answers.story) lines.push(`Een verhaal of moment dat de spreker altijd bijblijft: ${answers.story}`)
+  if (answers.catchphrase) lines.push(`Een uitspraak, stopwoord of zin die ${firstName} vaak zei: ${answers.catchphrase}`)
+
+  lines.push('')
+  lines.push(`## WAT ${firstName.toUpperCase()} ACHTERLAAT`)
+  if (answers.life_lesson) lines.push(`Wat de spreker van ${firstName} heeft geleerd of meegekregen: ${answers.life_lesson}`)
+  if (answers.passions) lines.push(`Passies, hobby's of bezigheden van ${firstName}: ${answers.passions}`)
+  if (answers.remember) lines.push(`Wat de spreker wil dat mensen nooit vergeten over ${firstName}: ${answers.remember}`)
 
   if (answers.circumstances) {
-    lines.push(`\nOmstandigheden van het afscheid:\n- ${answers.circumstances}`)
+    lines.push('')
+    lines.push('## OMSTANDIGHEDEN VAN HET AFSCHEID')
+    lines.push(`Toelichting van de spreker: ${answers.circumstances}`)
   }
 
-  lines.push('\nSchrijf nu de rouwbrief. Begin direct met de brief, zonder opschrift of inleiding.')
+  lines.push('')
+  lines.push('Schrijf nu de eulogie. Begin direct met de tekst.')
 
   return lines.join('\n')
 }
