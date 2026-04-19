@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { saveEulogyEdit, regenerateEulogy, finalizeEulogy } from './actions'
 
 type Props = {
@@ -15,15 +15,24 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
   const [text, setText] = useState(content)
   const [optIn, setOptIn] = useState(optInToCollective)
   const finalized = status === 'finalized'
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+    }
+  }, [text])
 
   return (
     <div>
       <textarea
+        ref={textareaRef}
         value={text}
         onChange={e => setText(e.target.value)}
         disabled={finalized}
-        rows={22}
-        className="w-full px-5 py-4 text-sm text-black border border-stone-300 rounded-xl leading-relaxed focus:outline-none focus:ring-2 focus:ring-stone-400 resize-none mb-5"
+        rows={1}
+        className="w-full px-5 py-4 text-sm text-black border border-stone-300 rounded-xl leading-relaxed focus:outline-none focus:ring-2 focus:ring-stone-400 resize-none overflow-hidden mb-5"
         style={{ backgroundColor: '#FFF8F2' }}
       />
 
