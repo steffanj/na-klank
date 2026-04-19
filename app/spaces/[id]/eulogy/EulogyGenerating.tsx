@@ -43,8 +43,11 @@ export default function EulogyGenerating({ jobId, spaceId }: Props) {
         </>
       ) : (
         <>
+          <div className="flex justify-center mb-5">
+            <div className="w-8 h-8 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
+          </div>
           <p className="text-black mb-2">Rouwbrief wordt opgesteld…</p>
-          <p className="text-sm text-stone-400">Dit duurt gewoonlijk een halve minuut.</p>
+          <p className="text-sm text-stone-400">Dit kan een paar minuten duren.</p>
         </>
       )}
     </div>
