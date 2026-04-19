@@ -1,7 +1,17 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { saveEulogyEdit, regenerateEulogy, finalizeEulogy, resetEulogy, reopenEulogy } from './actions'
+import { autoSaveEulogyEdit, regenerateEulogy, finalizeEulogy, resetEulogy, reopenEulogy, reviseEulogy } from './actions'
+
+const PRESETS = [
+  { key: 'shorter', label: 'Korter', instruction: 'Maak de tekst wat korter door minder essentiële zinnen te schrappen. Streef naar circa 20% minder woorden.' },
+  { key: 'longer', label: 'Langer', instruction: 'Maak de tekst wat langer door de gegeven inhoud iets meer ruimte te geven. Streef naar circa 20% meer woorden. Voeg geen verzonnen details toe.' },
+  { key: 'simpler', label: 'Eenvoudigere taal', instruction: 'Herschrijf de volledige tekst in eenvoudigere, toegankelijkere taal. Vervang moeilijke woorden door alledaagse alternatieven, maak lange zinnen korter, schrijf zoals mensen praten. Pas dit door de hele tekst toe.' },
+  { key: 'lighter', label: 'Vrolijker', instruction: 'Herschrijf de volledige tekst met een lichtere, warmere toon. Benadruk mooie herinneringen en dankbaarheid, gebruik meer warmte en levenslustigheid in de woordkeuze. Pas dit door de hele tekst toe.' },
+  { key: 'subdued', label: 'Ingetogener', instruction: 'Herschrijf de volledige tekst met een ingetogenere, stillere toon. Maak emotionele passages rustiger, vermijd pathos, laat verdriet meer tussen de regels zitten. Pas dit door de hele tekst toe.' },
+  { key: 'formal', label: 'Formeler', instruction: 'Herschrijf de volledige tekst in een formele stijl. Gebruik formele woordkeuze, vermijd spreektaal en informele uitdrukkingen, schrijf zoals voor een plechtige toespraak. Pas dit door de hele tekst toe.' },
+  { key: 'informal', label: 'Informeler', instruction: 'Herschrijf de volledige tekst in een informelere, persoonlijkere stijl. Gebruik spreektaal, directe aanspreekvormen, schrijf zoals je het werkelijk zou zeggen. Pas dit door de hele tekst toe.' },
+]
 
 type Props = {
   eulogyId: string
@@ -14,8 +24,26 @@ type Props = {
 export default function EulogyEditor({ eulogyId, spaceId, content, status, optInToCollective }: Props) {
   const [text, setText] = useState(content)
   const [optIn, setOptIn] = useState(optInToCollective)
+  const [selectedPresets, setSelectedPresets] = useState<Set<string>>(new Set())
+  const [freeInstruction, setFreeInstruction] = useState('')
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'pending' | 'saving' | 'saved'>('idle')
   const finalized = status === 'finalized'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const lastSavedText = useRef(content)
+
+  function togglePreset(key: string) {
+    setSelectedPresets(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  const combinedInstruction = [
+    ...Array.from(selectedPresets).map(k => PRESETS.find(p => p.key === k)!.instruction),
+    freeInstruction.trim(),
+  ].filter(Boolean).join(' ')
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -23,6 +51,23 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
     }
   }, [text])
+
+  useEffect(() => {
+    if (finalized || text === lastSavedText.current) return
+    setSaveStatus('pending')
+    const timer = setTimeout(async () => {
+      setSaveStatus('saving')
+      const fd = new FormData()
+      fd.set('eulogy_id', eulogyId)
+      fd.set('space_id', spaceId)
+      fd.set('content', text)
+      await autoSaveEulogyEdit(fd)
+      lastSavedText.current = text
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus('idle'), 2000)
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [text, eulogyId, spaceId, finalized])
 
   return (
     <div>
@@ -32,9 +77,14 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
         onChange={e => setText(e.target.value)}
         disabled={finalized}
         rows={1}
-        className="w-full px-5 py-4 text-sm text-black border border-stone-300 rounded-xl leading-relaxed focus:outline-none focus:ring-2 focus:ring-stone-400 resize-none overflow-hidden mb-5"
+        className="w-full px-5 py-4 text-sm text-black border border-stone-300 rounded-xl leading-relaxed focus:outline-none focus:ring-2 focus:ring-stone-400 resize-none overflow-hidden mb-1"
         style={{ backgroundColor: '#FFF8F2' }}
       />
+      <div className="h-5 mb-4 flex justify-end">
+        {saveStatus === 'pending' && <span className="text-xs text-stone-300">Opslaan...</span>}
+        {saveStatus === 'saving' && <span className="text-xs text-stone-400">Opslaan...</span>}
+        {saveStatus === 'saved' && <span className="text-xs text-stone-400">Opgeslagen</span>}
+      </div>
 
       {finalized ? (
         <div className="flex items-center gap-4">
@@ -74,18 +124,6 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
               </button>
             </form>
 
-            <form action={saveEulogyEdit}>
-              <input type="hidden" name="eulogy_id" value={eulogyId} />
-              <input type="hidden" name="space_id" value={spaceId} />
-              <input type="hidden" name="content" value={text} />
-              <button
-                type="submit"
-                className="px-5 py-2.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors"
-              >
-                Sla wijzigingen op
-              </button>
-            </form>
-
             <form action={regenerateEulogy}>
               <input type="hidden" name="eulogy_id" value={eulogyId} />
               <input type="hidden" name="space_id" value={spaceId} />
@@ -109,6 +147,50 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
               >
                 Afronden
               </button>
+            </form>
+          </div>
+
+          <div className="border-t border-stone-200 pt-5">
+            <p className="text-xs text-stone-400 mb-3">Aanpassen</p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {PRESETS.map(preset => (
+                <button
+                  key={preset.key}
+                  type="button"
+                  onClick={() => togglePreset(preset.key)}
+                  className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+                    selectedPresets.has(preset.key)
+                      ? 'bg-stone-800 text-white border-stone-800'
+                      : 'border-stone-300 text-stone-600 hover:border-stone-400'
+                  }`}
+                  style={selectedPresets.has(preset.key) ? {} : { backgroundColor: '#FFF8F2' }}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+            <form action={reviseEulogy}>
+              <input type="hidden" name="eulogy_id" value={eulogyId} />
+              <input type="hidden" name="space_id" value={spaceId} />
+              <input type="hidden" name="current_content" value={text} />
+              <input type="hidden" name="revision_instruction" value={combinedInstruction} />
+              <div className="flex gap-3 items-end">
+                <textarea
+                  value={freeInstruction}
+                  onChange={e => setFreeInstruction(e.target.value)}
+                  placeholder={'Vrije instructie, bijv. \u201Cmaak de opening wat directer\u201D'}
+                  rows={2}
+                  className="flex-1 px-4 py-2.5 text-sm text-black border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400 resize-none"
+                  style={{ backgroundColor: '#FFF8F2' }}
+                />
+                <button
+                  type="submit"
+                  disabled={!combinedInstruction}
+                  className="px-5 py-2.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                >
+                  Pas toe
+                </button>
+              </div>
             </form>
           </div>
         </div>

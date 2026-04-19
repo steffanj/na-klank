@@ -20,24 +20,38 @@ export function useGenerationJob(jobId: string | null) {
     if (!jobId) return
 
     const supabase = createClient()
+    let stopped = false
 
-    supabase
-      .from('generation_jobs')
-      .select('id, status, error_message, target_id, completed_at')
-      .eq('id', jobId)
-      .single()
-      .then(({ data }) => { if (data) setJob(data as GenerationJob) })
+    async function poll() {
+      const { data } = await supabase
+        .from('generation_jobs')
+        .select('id, status, error_message, target_id, completed_at')
+        .eq('id', jobId)
+        .single()
+      if (data && !stopped) setJob(data as GenerationJob)
+    }
+
+    poll()
+
+    const interval = setInterval(() => {
+      if (stopped) return
+      poll()
+    }, 3000)
 
     const channel = supabase
       .channel(`job:${jobId}`)
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'generation_jobs', filter: `id=eq.${jobId}` },
-        (payload) => setJob(payload.new as GenerationJob)
+        (payload) => { if (!stopped) setJob(payload.new as GenerationJob) }
       )
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
+    return () => {
+      stopped = true
+      clearInterval(interval)
+      supabase.removeChannel(channel)
+    }
   }, [jobId])
 
   return job

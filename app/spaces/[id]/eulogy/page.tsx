@@ -90,7 +90,7 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
   if (eulogy.status === 'generating') {
     const { data: activeJob } = await supabase
       .from('generation_jobs')
-      .select('id, status')
+      .select('id, status, job_type')
       .eq('target_id', eulogy.id)
       .in('status', ['pending', 'processing'])
       .order('created_at', { ascending: false })
@@ -99,7 +99,12 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
 
     return (
       <Shell>
-        <EulogyGenerating jobId={activeJob?.id ?? null} spaceId={id} eulogyId={eulogy.id} />
+        <EulogyGenerating
+          jobId={activeJob?.id ?? null}
+          spaceId={id}
+          eulogyId={eulogy.id}
+          isUpdate={activeJob?.job_type === 'eulogy_regenerate'}
+        />
       </Shell>
     )
   }

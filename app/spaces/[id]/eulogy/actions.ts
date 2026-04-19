@@ -73,6 +73,46 @@ export async function generateEulogy(formData: FormData) {
   redirect(`/spaces/${spaceId}/eulogy`)
 }
 
+export async function autoSaveEulogyEdit(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  const eulogyId = formData.get('eulogy_id') as string
+  const spaceId = formData.get('space_id') as string
+  const content = formData.get('content') as string
+
+  const { data: latest } = await supabase
+    .from('eulogy_versions')
+    .select('version_number')
+    .eq('eulogy_id', eulogyId)
+    .order('version_number', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const nextVersion = (latest?.version_number ?? 0) + 1
+
+  const { data: version } = await supabase
+    .from('eulogy_versions')
+    .insert({
+      eulogy_id: eulogyId,
+      version_number: nextVersion,
+      content,
+      generation_source: 'manual_edit',
+    })
+    .select('id')
+    .single()
+
+  if (version) {
+    await supabase
+      .from('eulogies')
+      .update({ current_version_id: version.id, updated_at: new Date().toISOString() })
+      .eq('id', eulogyId)
+  }
+
+  revalidatePath(`/spaces/${spaceId}/eulogy`)
+}
+
 export async function saveEulogyEdit(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -138,6 +178,49 @@ export async function regenerateEulogy(formData: FormData) {
     .single()
 
   if (job) fireEdgeFunction(eulogyId, job.id)
+
+  redirect(`/spaces/${spaceId}/eulogy`)
+}
+
+export async function reviseEulogy(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
+  const eulogyId = formData.get('eulogy_id') as string
+  const spaceId = formData.get('space_id') as string
+  const currentContent = formData.get('current_content') as string
+  const revisionInstruction = formData.get('revision_instruction') as string
+
+  if (!revisionInstruction?.trim()) redirect(`/spaces/${spaceId}/eulogy`)
+
+  await supabase
+    .from('eulogies')
+    .update({ status: 'generating', updated_at: new Date().toISOString() })
+    .eq('id', eulogyId)
+
+  const { data: job } = await supabase
+    .from('generation_jobs')
+    .insert({
+      memorial_space_id: spaceId,
+      job_type: 'eulogy_regenerate',
+      target_id: eulogyId,
+      triggered_by_user_id: user.id,
+    })
+    .select('id')
+    .single()
+
+  if (job) {
+    const admin = createAdminClient()
+    admin.functions.invoke('generate-eulogy', {
+      body: {
+        eulogy_id: eulogyId,
+        job_id: job.id,
+        current_content: currentContent,
+        revision_instruction: revisionInstruction.trim(),
+      },
+    }).catch(() => {})
+  }
 
   redirect(`/spaces/${spaceId}/eulogy`)
 }

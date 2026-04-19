@@ -9,6 +9,34 @@ const supabase = createClient(
 
 const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! })
 
+const REVISION_SYSTEM_PROMPT = `Je past een bestaande eulogie aan op verzoek van de auteur.
+
+---
+
+## WAT JE AANPAST
+
+Lees de instructie en voer die consequent door. Er zijn twee soorten instructies:
+
+**Stijl- of toonaanpassingen** (zoals: korter, formeler, informeler, vrolijker, ingetogener, eenvoudigere taal): deze gelden voor de volledige tekst. Herschrijf de hele eulogie in de gevraagde stijl. Wees niet terughoudend — een instructie "formeler" moet duidelijk merkbaar zijn in elke zin, niet alleen in een paar woorden.
+
+**Inhoudelijke aanpassingen** (zoals: "maak de opening directer", "verwijder het gedeelte over zijn werk"): voer deze precies uit en raak de rest niet aan.
+
+Wat je nooit doet:
+- Nieuwe feiten, details of anekdotes verzinnen die niet in de originele tekst of intake staan.
+- De persoonlijke herinneringen of specifieke details weggooien tenzij gevraagd.
+
+---
+
+## STRIKTE REGEL OVER VERZINNEN
+
+Je verzint niets. Geen nieuwe bijvoeglijke naamwoorden, sfeer of details die niet in de originele tekst of de intake-informatie staan. Stijl herschrijven is toegestaan — feiten verzinnen niet.
+
+---
+
+## TAAL EN OUTPUT
+
+Uitsluitend in het Nederlands. Begin direct met de herziene eulogie. Geen inleiding, geen meta-opmerkingen, geen kopjes.`
+
 const SYSTEM_PROMPT = `Je schrijft eulogieën: afscheidswoorden die hardop worden uitgesproken tijdens een uitvaart in Nederland. Je werkt voor nabestaanden die in een kwetsbare periode een waardige tekst nodig hebben over iemand die ze liefhadden.
 
 ---
@@ -138,6 +166,8 @@ Deno.serve(async (req) => {
     const body = await req.json()
     eulogyId = body.eulogy_id
     jobId = body.job_id
+    const currentContent: string | undefined = body.current_content
+    const revisionInstruction: string | undefined = body.revision_instruction
 
     if (!eulogyId || !jobId) {
       return new Response(JSON.stringify({ error: 'eulogy_id and job_id are required' }), { status: 400 })
@@ -233,11 +263,31 @@ Deno.serve(async (req) => {
     lines.push('')
     lines.push('Schrijf nu de eulogie. Begin direct met de tekst.')
 
+    const isRevision = !!(currentContent && revisionInstruction)
+
+    const userMessage = isRevision
+      ? [
+          `Pas de volgende eulogie aan op basis van de instructie hieronder.\n`,
+          `## INSTRUCTIE`,
+          revisionInstruction,
+          ``,
+          `## HUIDIGE TEKST`,
+          currentContent,
+          ``,
+          `## ORIGINELE INTAKE-INFORMATIE (ter context — voeg geen nieuwe details toe die hier niet in staan)`,
+          lines.join('\n'),
+          ``,
+          `Verander alleen wat de instructie vraagt. Behoud de rest. Begin direct met de herziene eulogie.`,
+        ].join('\n')
+      : lines.join('\n')
+
+    const systemPrompt = isRevision ? REVISION_SYSTEM_PROMPT : SYSTEM_PROMPT
+
     const message = await anthropic.messages.create({
       model: 'claude-opus-4-7',
       max_tokens: 8192,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: lines.join('\n') }],
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
     })
 
     const content = message.content[0].type === 'text' ? message.content[0].text : ''
@@ -252,7 +302,7 @@ Deno.serve(async (req) => {
 
     const nextVersion = (latestVersion?.version_number ?? 0) + 1
 
-    const { data: version } = await supabase
+    const { data: version, error: versionError } = await supabase
       .from('eulogy_versions')
       .insert({
         eulogy_id: eulogyId,
@@ -262,6 +312,8 @@ Deno.serve(async (req) => {
       })
       .select('id')
       .single()
+
+    if (versionError || !version) throw new Error(`Failed to insert eulogy_version: ${versionError?.message}`)
 
     await supabase
       .from('eulogies')
