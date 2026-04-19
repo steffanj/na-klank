@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
+import { addFamilyMember } from './actions'
 
 export default async function DirectorSpacePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -9,9 +10,7 @@ export default async function DirectorSpacePage({ params }: { params: Promise<{ 
 
   const { data: space } = await supabase
     .from('memorial_spaces')
-    .select(`
-      *, memorial_space_members(id, role, invited_email, accepted_at, user_id)
-    `)
+    .select(`*, memorial_space_members(id, role, invited_email, invited_name, accepted_at, user_id)`)
     .eq('id', id)
     .eq('created_by', user.id)
     .single()
@@ -26,16 +25,16 @@ export default async function DirectorSpacePage({ params }: { params: Promise<{ 
   ].filter(Boolean).join(' ')
 
   return (
-    <main className="min-h-screen bg-stone-50">
-      <div className="max-w-3xl mx-auto px-6 py-10">
-        <a href="/director/dashboard" className="text-sm text-stone-400 hover:text-stone-600 mb-6 inline-block">
+    <main className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FFF1E5' }}>
+      <div className="max-w-2xl mx-auto">
+        <a href="/director/dashboard" className="text-sm text-stone-400 hover:text-stone-600 mb-8 inline-block">
           ← Terug naar overzicht
         </a>
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-serif text-stone-800">{name}</h1>
+        <div className="mb-10">
+          <h1 className="text-3xl text-black">{name}</h1>
           {space.funeral_date && (
-            <p className="text-stone-400 text-sm mt-1">
+            <p className="text-stone-500 text-sm mt-1">
               Uitvaart: {new Date(space.funeral_date).toLocaleDateString('nl-NL', {
                 day: 'numeric', month: 'long', year: 'numeric'
               })}
@@ -43,73 +42,75 @@ export default async function DirectorSpacePage({ params }: { params: Promise<{ 
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          {[
-            { label: 'Rouwbrief', href: `/spaces/${id}/eulogy` },
-            { label: 'Gezamenlijke rouwbrief', href: `/spaces/${id}/collective-eulogy` },
-            { label: "Foto's", href: `/spaces/${id}/photo` },
-            { label: 'Stem', href: `/spaces/${id}/voice` },
-          ].map(m => (
-            <a
-              key={m.label}
-              href={m.href}
-              className="bg-white border border-stone-200 rounded-xl px-5 py-4 hover:border-stone-300 transition-colors"
-            >
-              <p className="font-medium text-stone-700">{m.label}</p>
-              <p className="text-xs text-stone-400 mt-1">Bekijk module →</p>
-            </a>
-          ))}
-        </div>
+        <section className="mb-10">
+          <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4">Modules</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: 'Rouwbrief', href: `/spaces/${id}/eulogy` },
+              { label: 'Gezamenlijke rouwbrief', href: `/spaces/${id}/collective-eulogy` },
+              { label: "Foto's", href: `/spaces/${id}/photo` },
+              { label: 'Voorlezen', href: `/spaces/${id}/voice` },
+            ].map(m => (
+              <a
+                key={m.label}
+                href={m.href}
+                className="border border-stone-300 rounded-xl px-5 py-4 hover:border-stone-400 transition-colors"
+                style={{ backgroundColor: '#FFF8F2' }}
+              >
+                <p className="text-black">{m.label}</p>
+                <p className="text-xs text-stone-400 mt-1">Bekijk module →</p>
+              </a>
+            ))}
+          </div>
+        </section>
 
         <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-medium text-stone-500 uppercase tracking-wide">Familieleden</h2>
-            <AddMemberForm spaceId={id} />
-          </div>
-          <div className="bg-white border border-stone-200 rounded-xl divide-y divide-stone-100">
+          <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4">Familieleden</h2>
+          <div className="rounded-xl border border-stone-300 divide-y divide-stone-200 mb-4" style={{ backgroundColor: '#FFF8F2' }}>
             {members.length === 0 ? (
               <p className="px-5 py-4 text-sm text-stone-400">Geen leden uitgenodigd.</p>
             ) : members.map(m => (
               <div key={m.id} className="px-5 py-3 flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-stone-700">{m.invited_email}</p>
-                  <p className="text-xs text-stone-400">{m.role === 'primary_contact' ? 'Primair contact' : 'Familielid'}</p>
+                  <p className="text-sm text-black">{m.invited_name ? `${m.invited_name} — ` : ''}{m.invited_email}</p>
+                  <p className="text-xs text-stone-400 mt-0.5">{m.role === 'primary_contact' ? 'Primair contact' : 'Familielid'}</p>
                 </div>
                 {m.accepted_at
-                  ? <span className="text-xs text-green-600">Actief</span>
-                  : <span className="text-xs text-amber-600">Uitnodiging verstuurd</span>
+                  ? <span className="text-xs text-green-700">Actief</span>
+                  : <span className="text-xs text-amber-700">Uitnodiging verstuurd</span>
                 }
               </div>
             ))}
           </div>
+
+          <form action={addFamilyMember} className="flex gap-2">
+            <input type="hidden" name="space_id" value={id} />
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="familielid@email.nl"
+              className="flex-1 px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-stone-400"
+              style={{ backgroundColor: '#FFF8F2' }}
+            />
+            <button
+              type="submit"
+              className="px-4 py-2.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors"
+            >
+              Uitnodigen
+            </button>
+          </form>
         </section>
       </div>
     </main>
   )
 }
 
-type MemberRow = { id: string; role: string; invited_email: string; accepted_at: string | null; user_id: string | null }
-
-// Inline server action for adding extra family members
-import { addFamilyMember } from './actions'
-
-function AddMemberForm({ spaceId }: { spaceId: string }) {
-  return (
-    <form action={addFamilyMember} className="flex gap-2">
-      <input type="hidden" name="space_id" value={spaceId} />
-      <input
-        name="email"
-        type="email"
-        required
-        placeholder="familielid@email.nl"
-        className="px-3 py-1.5 text-sm border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400"
-      />
-      <button
-        type="submit"
-        className="px-3 py-1.5 text-sm bg-stone-700 text-white rounded-lg hover:bg-stone-600 transition-colors"
-      >
-        Uitnodigen
-      </button>
-    </form>
-  )
+type MemberRow = {
+  id: string
+  role: string
+  invited_email: string
+  invited_name: string | null
+  accepted_at: string | null
+  user_id: string | null
 }

@@ -22,7 +22,7 @@ const MODULES = [
   },
   {
     key: 'voice',
-    label: 'Stem',
+    label: 'Voorlezen',
     description: 'Laat de rouwbrief voorlezen in een vertrouwde stem.',
     href: (id: string) => `/spaces/${id}/voice`,
   },

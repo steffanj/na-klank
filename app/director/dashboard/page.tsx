@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { DeleteSpaceButton } from './delete-space-button'
 
 export default async function DirectorDashboard() {
   const supabase = await createClient()
@@ -17,12 +18,12 @@ export default async function DirectorDashboard() {
     .order('created_at', { ascending: false })
 
   return (
-    <main className="min-h-screen bg-stone-50">
+    <main className="min-h-screen" style={{ backgroundColor: '#FFF1E5' }}>
       <div className="max-w-4xl mx-auto px-6 py-10">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="text-3xl font-serif text-stone-800">Na-klank</h1>
-            <p className="text-stone-400 text-sm mt-1">Uitvaartbegeleider dashboard</p>
+            <h1 className="text-3xl text-black">Na-klank</h1>
+            <p className="text-stone-500 text-sm mt-1">Uitvaartbegeleider dashboard</p>
           </div>
           <a
             href="/director/spaces/new"
@@ -51,25 +52,24 @@ export default async function DirectorDashboard() {
               ].filter(Boolean).join(' ')
 
               return (
-                <a
-                  key={space.id}
-                  href={`/director/spaces/${space.id}`}
-                  className="block bg-white border border-stone-200 rounded-xl px-6 py-5 hover:border-stone-300 transition-colors"
-                >
+                <div key={space.id} className="border border-stone-300 rounded-xl px-6 py-5 transition-colors" style={{ backgroundColor: '#FFF8F2' }}>
                   <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-medium text-stone-800 text-lg">{name}</p>
+                    <a href={`/director/spaces/${space.id}`} className="flex-1 min-w-0">
+                      <p className="font-medium text-black text-lg">{name}</p>
                       {space.funeral_date && (
-                        <p className="text-sm text-stone-400 mt-0.5">
+                        <p className="text-sm text-stone-500 mt-0.5">
                           Uitvaart: {new Date(space.funeral_date).toLocaleDateString('nl-NL', {
                             day: 'numeric', month: 'long', year: 'numeric'
                           })}
                         </p>
                       )}
+                    </a>
+                    <div className="flex items-center gap-4 ml-4 shrink-0">
+                      <ContactBadge member={primaryContact} />
+                      <DeleteSpaceButton spaceId={space.id} spaceName={name} />
                     </div>
-                    <ContactBadge member={primaryContact} />
                   </div>
-                </a>
+                </div>
               )
             })}
           </div>
