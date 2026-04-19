@@ -99,7 +99,7 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
 
     return (
       <Shell>
-        <EulogyGenerating jobId={activeJob?.id ?? null} spaceId={id} />
+        <EulogyGenerating jobId={activeJob?.id ?? null} spaceId={id} eulogyId={eulogy.id} />
       </Shell>
     )
   }
