@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
@@ -10,14 +11,9 @@ const INTAKE_KEYS = [
 ]
 
 function fireEdgeFunction(eulogyId: string, jobId: string) {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/generate-eulogy`
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-    },
-    body: JSON.stringify({ eulogy_id: eulogyId, job_id: jobId }),
+  const admin = createAdminClient()
+  admin.functions.invoke('generate-eulogy', {
+    body: { eulogy_id: eulogyId, job_id: jobId },
   }).catch(() => {})
 }
 
