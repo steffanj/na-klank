@@ -168,6 +168,7 @@ Deno.serve(async (req) => {
     jobId = body.job_id
     const currentContent: string | undefined = body.current_content
     const revisionInstruction: string | undefined = body.revision_instruction
+    const variationSeed: number | undefined = body.variation_seed
 
     if (!eulogyId || !jobId) {
       return new Response(JSON.stringify({ error: 'eulogy_id and job_id are required' }), { status: 400 })
@@ -261,7 +262,11 @@ Deno.serve(async (req) => {
     }
 
     lines.push('')
-    lines.push('Schrijf nu de eulogie. Begin direct met de tekst.')
+    if (variationSeed !== undefined) {
+      lines.push(`Schrijf een versie die qua opening, opbouw en formulering duidelijk verschilt van een eventueel eerder gegenereerde versie op basis van dezelfde input. Varieer de structuur en de invalshoek. Variatiesleutel: ${variationSeed}`)
+    } else {
+      lines.push('Schrijf nu de eulogie. Begin direct met de tekst.')
+    }
 
     const isRevision = !!(currentContent && revisionInstruction)
 

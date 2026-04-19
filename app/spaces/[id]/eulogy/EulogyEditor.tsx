@@ -81,36 +81,24 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
         style={{ backgroundColor: '#FFF8F2' }}
       />
       <div className="h-5 mb-4 flex justify-end">
-        {saveStatus === 'pending' && <span className="text-xs text-stone-300">Opslaan...</span>}
-        {saveStatus === 'saving' && <span className="text-xs text-stone-400">Opslaan...</span>}
-        {saveStatus === 'saved' && <span className="text-xs text-stone-400">Opgeslagen</span>}
+        {saveStatus === 'pending' && <span className="text-xs text-black">Opslaan...</span>}
+        {saveStatus === 'saving' && <span className="text-xs text-black">Opslaan...</span>}
+        {saveStatus === 'saved' && <span className="text-xs text-black">Opgeslagen</span>}
       </div>
 
       {finalized ? (
         <div className="flex items-center gap-4">
-          <p className="text-sm text-stone-400">Dit afscheidswoord is afgerond.</p>
+          <p className="text-sm text-black">Dit afscheidswoord is afgerond.</p>
           <form action={reopenEulogy} className="inline-flex items-center">
             <input type="hidden" name="eulogy_id" value={eulogyId} />
             <input type="hidden" name="space_id" value={spaceId} />
-            <button type="submit" className="text-xs text-stone-400 hover:text-stone-600 underline">
+            <button type="submit" className="text-xs text-black hover:text-black underline">
               Heropenen
             </button>
           </form>
         </div>
       ) : (
         <div className="space-y-5">
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={optIn}
-              onChange={e => setOptIn(e.target.checked)}
-              className="mt-0.5 shrink-0"
-            />
-            <span className="text-sm text-stone-600">
-              Deel mijn herinneringen voor het gezamenlijk afscheidswoord
-            </span>
-          </label>
-
           <div className="flex gap-3 flex-wrap">
             <form action={resetEulogy}>
               <input type="hidden" name="eulogy_id" value={eulogyId} />
@@ -120,7 +108,7 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
                 className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
                 style={{ backgroundColor: '#FFF8F2' }}
               >
-                Antwoorden aanpassen
+                ← Antwoorden aanpassen
               </button>
             </form>
 
@@ -135,23 +123,10 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
                 Opnieuw genereren
               </button>
             </form>
-
-            <form action={finalizeEulogy}>
-              <input type="hidden" name="eulogy_id" value={eulogyId} />
-              <input type="hidden" name="space_id" value={spaceId} />
-              <input type="hidden" name="opt_in_to_collective" value={String(optIn)} />
-              <button
-                type="submit"
-                className="px-5 py-2.5 text-sm border border-stone-300 text-stone-500 rounded-lg hover:border-stone-400 transition-colors"
-                style={{ backgroundColor: '#FFF8F2' }}
-              >
-                Afronden
-              </button>
-            </form>
           </div>
 
           <div className="border-t border-stone-200 pt-5">
-            <p className="text-xs text-stone-400 mb-3">Aanpassen</p>
+            <p className="text-xs text-black mb-3">Aanpassen</p>
             <div className="flex flex-wrap gap-2 mb-4">
               {PRESETS.map(preset => (
                 <button
@@ -161,7 +136,7 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
                   className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                     selectedPresets.has(preset.key)
                       ? 'bg-stone-800 text-white border-stone-800'
-                      : 'border-stone-300 text-stone-600 hover:border-stone-400'
+                      : 'border-stone-300 text-black hover:border-stone-400'
                   }`}
                   style={selectedPresets.has(preset.key) ? {} : { backgroundColor: '#FFF8F2' }}
                 >
@@ -174,13 +149,13 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
               <input type="hidden" name="space_id" value={spaceId} />
               <input type="hidden" name="current_content" value={text} />
               <input type="hidden" name="revision_instruction" value={combinedInstruction} />
-              <div className="flex gap-3 items-end">
-                <textarea
+              <div className="flex gap-3 items-center">
+                <input
+                  type="text"
                   value={freeInstruction}
                   onChange={e => setFreeInstruction(e.target.value)}
                   placeholder={'Vrije instructie, bijv. \u201Cmaak de opening wat directer\u201D'}
-                  rows={2}
-                  className="flex-1 px-4 py-2.5 text-sm text-black border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400 resize-none"
+                  className="flex-1 px-4 py-2.5 text-sm text-black border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400"
                   style={{ backgroundColor: '#FFF8F2' }}
                 />
                 <button
@@ -191,6 +166,33 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
                   Pas toe
                 </button>
               </div>
+            </form>
+          </div>
+
+          <div className="border-t border-stone-200 pt-5 space-y-4">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={optIn}
+                onChange={e => setOptIn(e.target.checked)}
+                className="mt-0.5 shrink-0"
+              />
+              <span className="text-sm text-black">
+                Deel mijn herinneringen voor het gezamenlijk afscheidswoord
+              </span>
+            </label>
+
+            <form action={finalizeEulogy}>
+              <input type="hidden" name="eulogy_id" value={eulogyId} />
+              <input type="hidden" name="space_id" value={spaceId} />
+              <input type="hidden" name="opt_in_to_collective" value={String(optIn)} />
+              <button
+                type="submit"
+                className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+                style={{ backgroundColor: '#FFF8F2' }}
+              >
+                Afronden
+              </button>
             </form>
           </div>
         </div>

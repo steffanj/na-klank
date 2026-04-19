@@ -31,7 +31,7 @@ export default function LoginPage() {
       <main className="min-h-screen flex items-center justify-center bg-stone-50">
         <div className="max-w-md w-full px-6 py-12 text-center">
           <h1 className="text-2xl font-serif text-stone-800 mb-4">Controleer uw e-mail</h1>
-          <p className="text-stone-600">
+          <p className="text-black">
             We hebben een inloglink gestuurd naar <strong>{email}</strong>. Klik op de link in de e-mail om in te loggen.
           </p>
         </div>
@@ -44,7 +44,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full px-6 py-12">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-serif text-stone-800 mb-2">Na-klank</h1>
-          <p className="text-stone-500 text-sm">Een persoonlijk eerbetoon</p>
+          <p className="text-black text-sm">Een persoonlijk eerbetoon</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

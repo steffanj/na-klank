@@ -37,12 +37,12 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
     return (
       <main className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FFF1E5' }}>
         <div className="max-w-2xl mx-auto">
-          <a href={`/spaces/${id}`} className="text-sm text-stone-400 hover:text-stone-600 mb-8 inline-block">
+          <a href={`/spaces/${id}`} className="text-sm text-black hover:text-black mb-8 inline-block">
             ← Terug
           </a>
           <div className="mb-8">
             <h1 className="text-3xl text-black">Afscheidswoord</h1>
-            <p className="text-stone-500 text-sm mt-1">{fullName}</p>
+            <p className="text-black text-sm mt-1">{fullName}</p>
           </div>
           {children}
         </div>
@@ -53,7 +53,7 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
   if (!eulogy) {
     return (
       <Shell>
-        <p className="text-stone-600 text-sm mb-8">
+        <p className="text-black text-sm mb-8">
           Beantwoord een aantal vragen over {firstName}, en wij stellen een persoonlijke afscheidswoord voor je op.
         </p>
         <form action={startEulogy.bind(null, id)}>

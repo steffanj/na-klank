@@ -11,7 +11,7 @@ export function DeleteSpaceButton({ spaceId, spaceName }: { spaceId: string; spa
     <div className="contents">
       <button
         onClick={e => { e.preventDefault(); setConfirming(true) }}
-        className="text-sm text-stone-300 hover:text-red-600 transition-colors shrink-0"
+        className="text-sm text-black hover:text-red-600 transition-colors shrink-0"
       >
         Verwijderen
       </button>
@@ -39,7 +39,7 @@ export function DeleteSpaceButton({ spaceId, spaceName }: { spaceId: string; spa
             </form>
             <button
               onClick={() => setConfirming(false)}
-              className="text-sm text-stone-400 hover:text-stone-600"
+              className="text-sm text-black hover:text-black"
             >
               Annuleren
             </button>

@@ -23,7 +23,7 @@ export default function NewSpacePage() {
   return (
     <main className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FFF1E5' }}>
       <div className="max-w-xl mx-auto">
-        <a href="/director/dashboard" className="text-sm text-stone-400 hover:text-stone-600 mb-8 inline-block">
+        <a href="/director/dashboard" className="text-sm text-black hover:text-black mb-8 inline-block">
           ← Terug naar overzicht
         </a>
         <h1 className="text-3xl text-black mb-10">Nieuwe herdenkingsruimte</h1>

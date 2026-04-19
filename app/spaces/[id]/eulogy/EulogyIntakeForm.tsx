@@ -33,7 +33,7 @@ export default function EulogyIntakeForm({ eulogyId, spaceId, firstName, savedAn
                     {replace(q.label)}
                   </label>
                   {q.subtitle && (
-                    <p className="text-xs text-stone-400 mb-1.5">{q.subtitle}</p>
+                    <p className="text-xs text-black mb-1.5">{q.subtitle}</p>
                   )}
                   {q.multiline ? (
                     <textarea

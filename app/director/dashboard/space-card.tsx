@@ -24,7 +24,7 @@ export function SpaceCard({
         <a href={`/director/spaces/${space.id}`} className="flex-1 min-w-0">
           <p className="font-medium text-black text-lg">{name}</p>
           {space.funeral_date && (
-            <p className="text-sm text-stone-500 mt-0.5">
+            <p className="text-sm text-black mt-0.5">
               Uitvaart: {new Date(space.funeral_date).toLocaleDateString('nl-NL', {
                 day: 'numeric', month: 'long', year: 'numeric',
               })}
@@ -36,7 +36,7 @@ export function SpaceCard({
           {!confirming && (
             <button
               onClick={() => setConfirming(true)}
-              className="text-sm text-stone-300 hover:text-red-600 transition-colors"
+              className="text-sm text-black hover:text-red-600 transition-colors"
             >
               Verwijderen
             </button>
@@ -63,7 +63,7 @@ export function SpaceCard({
             </form>
             <button
               onClick={() => setConfirming(false)}
-              className="text-sm text-stone-400 hover:text-stone-600"
+              className="text-sm text-black hover:text-black"
             >
               Annuleren
             </button>
@@ -75,7 +75,7 @@ export function SpaceCard({
 }
 
 function ContactBadge({ member }: { member: MemberRow | undefined }) {
-  if (!member) return <span className="text-xs text-stone-300">Geen contact</span>
+  if (!member) return <span className="text-xs text-black">Geen contact</span>
   if (member.accepted_at) {
     return (
       <span className="text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-3 py-1">

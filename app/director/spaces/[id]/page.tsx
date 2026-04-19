@@ -27,14 +27,14 @@ export default async function DirectorSpacePage({ params }: { params: Promise<{ 
   return (
     <main className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FFF1E5' }}>
       <div className="max-w-2xl mx-auto">
-        <a href="/director/dashboard" className="text-sm text-stone-400 hover:text-stone-600 mb-8 inline-block">
+        <a href="/director/dashboard" className="text-sm text-black hover:text-black mb-8 inline-block">
           ← Terug naar overzicht
         </a>
 
         <div className="mb-10">
           <h1 className="text-3xl text-black">{name}</h1>
           {space.funeral_date && (
-            <p className="text-stone-500 text-sm mt-1">
+            <p className="text-black text-sm mt-1">
               Uitvaart: {new Date(space.funeral_date).toLocaleDateString('nl-NL', {
                 day: 'numeric', month: 'long', year: 'numeric'
               })}
@@ -58,7 +58,7 @@ export default async function DirectorSpacePage({ params }: { params: Promise<{ 
                 style={{ backgroundColor: '#FFF8F2' }}
               >
                 <p className="text-black">{m.label}</p>
-                <p className="text-xs text-stone-400 mt-1">Bekijk module →</p>
+                <p className="text-xs text-black mt-1">Bekijk module →</p>
               </a>
             ))}
           </div>
@@ -68,12 +68,12 @@ export default async function DirectorSpacePage({ params }: { params: Promise<{ 
           <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4">Familieleden</h2>
           <div className="rounded-xl border border-stone-300 divide-y divide-stone-200 mb-4" style={{ backgroundColor: '#FFF8F2' }}>
             {members.length === 0 ? (
-              <p className="px-5 py-4 text-sm text-stone-400">Geen leden uitgenodigd.</p>
+              <p className="px-5 py-4 text-sm text-black">Geen leden uitgenodigd.</p>
             ) : members.map(m => (
               <div key={m.id} className="px-5 py-3 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-black">{m.invited_name ? `${m.invited_name} — ` : ''}{m.invited_email}</p>
-                  <p className="text-xs text-stone-400 mt-0.5">{m.role === 'primary_contact' ? 'Primair contact' : 'Familielid'}</p>
+                  <p className="text-xs text-black mt-0.5">{m.role === 'primary_contact' ? 'Primair contact' : 'Familielid'}</p>
                 </div>
                 {m.accepted_at
                   ? <span className="text-xs text-green-700">Actief</span>

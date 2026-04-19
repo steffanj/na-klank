@@ -39,7 +39,7 @@ export default function EulogyGenerating({ jobId, spaceId, eulogyId, isUpdate }:
           <p className="text-black mb-3">Er is iets misgegaan bij het opstellen.</p>
           <a
             href={`/spaces/${spaceId}/eulogy`}
-            className="text-sm text-stone-500 hover:text-stone-700 underline"
+            className="text-sm text-black hover:text-stone-700 underline"
           >
             Probeer opnieuw
           </a>
@@ -50,11 +50,11 @@ export default function EulogyGenerating({ jobId, spaceId, eulogyId, isUpdate }:
             <div className="w-8 h-8 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
           </div>
           <p className="text-black mb-2">{isUpdate ? 'Afscheidswoord wordt bijgewerkt…' : 'Afscheidswoord wordt opgesteld…'}</p>
-          <p className="text-sm text-stone-400 mb-6">Dit kan een paar minuten duren.</p>
+          <p className="text-sm text-black mb-6">Dit kan een paar minuten duren.</p>
           <form action={resetEulogy}>
             <input type="hidden" name="eulogy_id" value={eulogyId} />
             <input type="hidden" name="space_id" value={spaceId} />
-            <button type="submit" className="text-xs text-stone-400 hover:text-stone-600 underline">
+            <button type="submit" className="text-xs text-black hover:text-black underline">
               Vastgelopen? Vragen opnieuw invullen
             </button>
           </form>

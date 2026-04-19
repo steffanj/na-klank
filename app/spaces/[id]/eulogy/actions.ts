@@ -177,7 +177,12 @@ export async function regenerateEulogy(formData: FormData) {
     .select('id')
     .single()
 
-  if (job) fireEdgeFunction(eulogyId, job.id)
+  if (job) {
+    const admin = createAdminClient()
+    admin.functions.invoke('generate-eulogy', {
+      body: { eulogy_id: eulogyId, job_id: job.id, variation_seed: Math.random() },
+    }).catch(() => {})
+  }
 
   redirect(`/spaces/${spaceId}/eulogy`)
 }

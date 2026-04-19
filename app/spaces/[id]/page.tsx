@@ -1,6 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 
+async function logout() {
+  'use server'
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect('/auth/login')
+}
+
 const MODULES = [
   {
     key: 'eulogy',
@@ -52,10 +59,10 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
     <main className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FFF1E5' }}>
       <div className="max-w-2xl mx-auto">
         <div className="mb-10">
-          <p className="text-stone-500 text-sm mb-1">In herinnering aan</p>
+          <p className="text-black text-sm mb-1">In herinnering aan</p>
           <h1 className="text-3xl text-black">{name}</h1>
           {space.funeral_date && (
-            <p className="text-stone-500 text-sm mt-1">
+            <p className="text-black text-sm mt-1">
               Uitvaart: {new Date(space.funeral_date).toLocaleDateString('nl-NL', {
                 day: 'numeric', month: 'long', year: 'numeric'
               })}
@@ -63,7 +70,14 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
           )}
         </div>
 
-        <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4">Modules</h2>
+        <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4 flex items-center justify-between">
+          Modules
+          <form action={logout}>
+            <button type="submit" className="text-xs text-black hover:text-black">
+              Uitloggen
+            </button>
+          </form>
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {MODULES.map(module => (
             <a
@@ -73,7 +87,7 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
               style={{ backgroundColor: '#FFF8F2' }}
             >
               <p className="text-black">{module.label}</p>
-              <p className="text-xs text-stone-400 mt-1">{module.description}</p>
+              <p className="text-xs text-black mt-1">{module.description}</p>
             </a>
           ))}
         </div>

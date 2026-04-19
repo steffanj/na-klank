@@ -25,7 +25,7 @@ export default async function DirectorDashboard() {
         <div className="flex items-center justify-between mb-10">
           <div>
             <h1 className="text-3xl text-black">Na-klank</h1>
-            <p className="text-stone-500 text-sm mt-1">Uitvaartbegeleider dashboard</p>
+            <p className="text-black text-sm mt-1">Uitvaartbegeleider dashboard</p>
           </div>
           <a
             href="/director/spaces/new"
@@ -36,9 +36,9 @@ export default async function DirectorDashboard() {
         </div>
 
         {!spaces || spaces.length === 0 ? (
-          <div className="text-center py-24 text-stone-400">
+          <div className="text-center py-24 text-black">
             <p className="text-lg mb-2">Nog geen herdenkingsruimtes</p>
-            <a href="/director/spaces/new" className="text-stone-600 underline text-sm">
+            <a href="/director/spaces/new" className="text-black underline text-sm">
               Maak de eerste aan
             </a>
           </div>
