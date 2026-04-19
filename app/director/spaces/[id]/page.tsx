@@ -86,6 +86,14 @@ export default async function DirectorSpacePage({ params }: { params: Promise<{ 
           <form action={addFamilyMember} className="flex gap-2">
             <input type="hidden" name="space_id" value={id} />
             <input
+              name="name"
+              type="text"
+              required
+              placeholder="Voornaam"
+              className="w-36 px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-stone-400"
+              style={{ backgroundColor: '#FFF8F2' }}
+            />
+            <input
               name="email"
               type="email"
               required

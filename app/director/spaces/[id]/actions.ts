@@ -14,10 +14,12 @@ export async function addFamilyMember(formData: FormData) {
 
   const space_id = formData.get('space_id') as string
   const email = formData.get('email') as string
+  const name = formData.get('name') as string || null
 
   await supabase.from('memorial_space_members').insert({
     memorial_space_id: space_id,
     invited_email: email,
+    invited_name: name,
     role: 'family_member',
     invited_by: user.id,
   })
