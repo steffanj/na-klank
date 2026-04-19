@@ -159,6 +159,23 @@ export async function resetEulogy(formData: FormData) {
   redirect(`/spaces/${spaceId}/eulogy`)
 }
 
+export async function reopenEulogy(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
+  const eulogyId = formData.get('eulogy_id') as string
+  const spaceId = formData.get('space_id') as string
+
+  await supabase
+    .from('eulogies')
+    .update({ status: 'ready', updated_at: new Date().toISOString() })
+    .eq('id', eulogyId)
+    .eq('author_user_id', user.id)
+
+  redirect(`/spaces/${spaceId}/eulogy`)
+}
+
 export async function finalizeEulogy(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
