@@ -28,7 +28,7 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
 
   const { data: eulogy } = await supabase
     .from('eulogies')
-    .select('id, status, current_version_id, opt_in_to_collective')
+    .select('id, status, current_version_id')
     .eq('memorial_space_id', id)
     .eq('author_user_id', user.id)
     .maybeSingle()
@@ -110,11 +110,18 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
   }
 
   if (eulogy.status === 'ready' || eulogy.status === 'finalized') {
-    const { data: version } = await supabase
-      .from('eulogy_versions')
-      .select('content')
-      .eq('id', eulogy.current_version_id!)
-      .single()
+    const [{ data: version }, { data: profile }] = await Promise.all([
+      supabase
+        .from('eulogy_versions')
+        .select('content')
+        .eq('id', eulogy.current_version_id!)
+        .single(),
+      supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single(),
+    ])
 
     return (
       <Shell>
@@ -123,7 +130,8 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
           spaceId={id}
           content={version?.content ?? ''}
           status={eulogy.status}
-          optInToCollective={eulogy.opt_in_to_collective}
+          fullName={fullName}
+          authorName={profile?.display_name ?? user.email ?? null}
         />
       </Shell>
     )

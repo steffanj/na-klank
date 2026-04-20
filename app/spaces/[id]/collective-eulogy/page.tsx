@@ -6,6 +6,7 @@ import CollectiveEulogyGenerating from './CollectiveEulogyGenerating'
 import CollectiveEulogyEditor from './CollectiveEulogyEditor'
 import { revokeAndRegenerateToken, synthesizeCollectiveEulogy } from './actions'
 import CopyButton from './CopyButton'
+import CollapsibleContributions from './CollapsibleContributions'
 
 export default async function CollectiveEulogyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -92,12 +93,12 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
 
     return (
       <Shell>
-        <CollectiveEulogyGenerating jobId={activeJob?.id ?? null} spaceId={id} />
+        <CollectiveEulogyGenerating jobId={activeJob?.id ?? null} spaceId={id} isUpdate={!!collectiveEulogy.current_version_id} />
       </Shell>
     )
   }
 
-  if (collectiveEulogy?.status === 'ready') {
+  if (collectiveEulogy?.status === 'ready' || collectiveEulogy?.status === 'finalized') {
     const { data: version } = await supabase
       .from('collective_eulogy_versions')
       .select('content')
@@ -106,7 +107,30 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
 
     return (
       <Shell>
-        <CollectiveEulogyEditor spaceId={id} content={version?.content ?? ''} />
+        <div className="space-y-10">
+          <CollectiveEulogyEditor
+            spaceId={id}
+            content={version?.content ?? ''}
+            status={collectiveEulogy.status}
+            fullName={fullName}
+          />
+
+          {isPrimaryContact && (
+            <CollapsibleContributions pendingCount={pendingCount}>
+              <p className="text-xs text-stone-500 mb-4">
+                Na hermodereren kun je het afscheidswoord opnieuw genereren.
+              </p>
+              <ContributionList
+                contributions={(contributions ?? []).map(c => ({
+                  ...c,
+                  answers_json: (c.answers_json ?? {}) as Record<string, string>,
+                }))}
+                spaceId={id}
+                isPrimaryContact={isPrimaryContact}
+              />
+            </CollapsibleContributions>
+          )}
+        </div>
       </Shell>
     )
   }

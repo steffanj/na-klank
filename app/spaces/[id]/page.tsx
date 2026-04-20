@@ -61,6 +61,12 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
 
   const members = (space.memorial_space_members ?? []) as MemberRow[]
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', user.id)
+    .single()
+
   const { data: myMembership } = await supabase
     .from('memorial_space_members')
     .select('role')
@@ -95,11 +101,14 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
 
         <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4 flex items-center justify-between">
           Modules
-          <form action={logout}>
-            <button type="submit" className="text-xs text-black hover:underline">
-              Uitloggen
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-black">Ingelogd als: {profile?.display_name || user.email}</span>
+            <form action={logout} className="inline-flex">
+              <button type="submit" className="text-xs text-black hover:underline">
+                Uitloggen
+              </button>
+            </form>
+          </div>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
           {MODULES.map(module => (

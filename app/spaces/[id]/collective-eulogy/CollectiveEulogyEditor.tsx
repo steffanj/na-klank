@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { autoSaveCollectiveEulogyEdit, regenerateCollectiveEulogy, reviseCollectiveEulogy } from './actions'
+import { downloadEulogyPdf } from '@/lib/pdf'
+import { autoSaveCollectiveEulogyEdit, regenerateCollectiveEulogy, reviseCollectiveEulogy, finalizeCollectiveEulogy, reopenCollectiveEulogy } from './actions'
 
 const PRESETS = [
   { key: 'shorter', label: 'Korter', instruction: 'Maak de tekst wat korter door minder essentiële zinnen te schrappen. Streef naar circa 20% minder woorden.' },
@@ -16,13 +17,18 @@ const PRESETS = [
 type Props = {
   spaceId: string
   content: string
+  status: string
+  fullName: string
 }
 
-export default function CollectiveEulogyEditor({ spaceId, content }: Props) {
+
+export default function CollectiveEulogyEditor({ spaceId, content, status, fullName }: Props) {
   const [text, setText] = useState(content)
   const [selectedPresets, setSelectedPresets] = useState<Set<string>>(new Set())
   const [freeInstruction, setFreeInstruction] = useState('')
   const [saveStatus, setSaveStatus] = useState<'idle' | 'pending' | 'saving' | 'saved'>('idle')
+  const [copied, setCopied] = useState(false)
+  const finalized = status === 'finalized'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const lastSavedText = useRef(content)
 
@@ -48,7 +54,7 @@ export default function CollectiveEulogyEditor({ spaceId, content }: Props) {
   }, [text])
 
   useEffect(() => {
-    if (text === lastSavedText.current) return
+    if (finalized || text === lastSavedText.current) return
     setSaveStatus('pending')
     const timer = setTimeout(async () => {
       setSaveStatus('saving')
@@ -61,7 +67,22 @@ export default function CollectiveEulogyEditor({ spaceId, content }: Props) {
       setTimeout(() => setSaveStatus('idle'), 2000)
     }, 2000)
     return () => clearTimeout(timer)
-  }, [text, spaceId])
+  }, [text, spaceId, finalized])
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  function handleDownload() {
+    downloadEulogyPdf({
+      fullName,
+      subtitle: 'Gezamenlijk afscheidswoord',
+      text,
+      filename: `${fullName} — Gezamenlijk afscheidswoord.pdf`,
+    })
+  }
 
   return (
     <div>
@@ -69,6 +90,7 @@ export default function CollectiveEulogyEditor({ spaceId, content }: Props) {
         ref={textareaRef}
         value={text}
         onChange={e => setText(e.target.value)}
+        disabled={finalized}
         rows={1}
         className="w-full px-5 py-4 text-sm text-black border border-stone-300 rounded-xl leading-relaxed focus:outline-none focus:ring-2 focus:ring-stone-400 resize-none overflow-hidden mb-1"
         style={{ backgroundColor: '#FFF8F2' }}
@@ -78,63 +100,124 @@ export default function CollectiveEulogyEditor({ spaceId, content }: Props) {
         {saveStatus === 'saved' && <span className="text-xs text-black">Opgeslagen</span>}
       </div>
 
-      <div className="space-y-5">
-        <div className="flex gap-3 flex-wrap">
-          <form action={regenerateCollectiveEulogy}>
-            <input type="hidden" name="space_id" value={spaceId} />
+      {finalized ? (
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-black">Dit afscheidswoord is afgerond.</p>
+            <form action={reopenCollectiveEulogy} className="inline-flex items-center">
+              <input type="hidden" name="space_id" value={spaceId} />
+              <button type="submit" className="text-xs text-black hover:text-black underline">
+                Heropenen
+              </button>
+            </form>
+          </div>
+          <div className="flex gap-3 flex-wrap">
             <button
-              type="submit"
+              type="button"
+              onClick={handleCopy}
               className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
               style={{ backgroundColor: '#FFF8F2' }}
             >
-              Opnieuw genereren
+              {copied ? 'Gekopieerd' : 'Kopieer tekst'}
             </button>
-          </form>
-        </div>
-
-        <div className="border-t border-stone-200 pt-5">
-          <p className="text-xs text-black mb-3">Aanpassen</p>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {PRESETS.map(preset => (
-              <button
-                key={preset.key}
-                type="button"
-                onClick={() => togglePreset(preset.key)}
-                className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
-                  selectedPresets.has(preset.key)
-                    ? 'bg-stone-800 text-white border-stone-800'
-                    : 'border-stone-300 text-black hover:border-stone-400'
-                }`}
-                style={selectedPresets.has(preset.key) ? {} : { backgroundColor: '#FFF8F2' }}
-              >
-                {preset.label}
-              </button>
-            ))}
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+              style={{ backgroundColor: '#FFF8F2' }}
+            >
+              Download
+            </button>
           </div>
-          <form action={reviseCollectiveEulogy}>
-            <input type="hidden" name="space_id" value={spaceId} />
-            <input type="hidden" name="current_content" value={text} />
-            <input type="hidden" name="revision_instruction" value={combinedInstruction} />
-            <div className="flex gap-3 items-center">
-              <input
-                type="text"
-                value={freeInstruction}
-                onChange={e => setFreeInstruction(e.target.value)}
-                placeholder={'Vrije instructie, bijv. \u201Cmaak de opening wat directer\u201D'}
-                className="flex-1 px-4 py-2.5 text-sm text-black border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400"
-                style={{ backgroundColor: '#FFF8F2' }}
-              />
+        </div>
+      ) : (
+        <div className="space-y-5">
+          <div className="flex gap-3 flex-wrap">
+            <form action={regenerateCollectiveEulogy}>
+              <input type="hidden" name="space_id" value={spaceId} />
               <button
                 type="submit"
-                disabled={!combinedInstruction}
-                className="px-5 py-2.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+                style={{ backgroundColor: '#FFF8F2' }}
               >
-                Pas toe
+                Opnieuw genereren
               </button>
+            </form>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+              style={{ backgroundColor: '#FFF8F2' }}
+            >
+              {copied ? 'Gekopieerd' : 'Kopieer tekst'}
+            </button>
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+              style={{ backgroundColor: '#FFF8F2' }}
+            >
+              Download
+            </button>
+          </div>
+
+          <div className="border-t border-stone-200 pt-5">
+            <p className="text-xs text-black mb-3">Aanpassen</p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {PRESETS.map(preset => (
+                <button
+                  key={preset.key}
+                  type="button"
+                  onClick={() => togglePreset(preset.key)}
+                  className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+                    selectedPresets.has(preset.key)
+                      ? 'bg-stone-800 text-white border-stone-800'
+                      : 'border-stone-300 text-black hover:border-stone-400'
+                  }`}
+                  style={selectedPresets.has(preset.key) ? {} : { backgroundColor: '#FFF8F2' }}
+                >
+                  {preset.label}
+                </button>
+              ))}
             </div>
-          </form>
+            <form action={reviseCollectiveEulogy}>
+              <input type="hidden" name="space_id" value={spaceId} />
+              <input type="hidden" name="current_content" value={text} />
+              <input type="hidden" name="revision_instruction" value={combinedInstruction} />
+              <div className="flex gap-3 items-center">
+                <input
+                  type="text"
+                  value={freeInstruction}
+                  onChange={e => setFreeInstruction(e.target.value)}
+                  placeholder={'Vrije instructie, bijv. \u201Cmaak de opening wat directer\u201D'}
+                  className="flex-1 px-4 py-2.5 text-sm text-black border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400"
+                  style={{ backgroundColor: '#FFF8F2' }}
+                />
+                <button
+                  type="submit"
+                  disabled={!combinedInstruction}
+                  className="px-5 py-2.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                >
+                  Pas toe
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div className="border-t border-stone-200 pt-5">
+            <form action={finalizeCollectiveEulogy}>
+              <input type="hidden" name="space_id" value={spaceId} />
+              <button
+                type="submit"
+                className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+                style={{ backgroundColor: '#FFF8F2' }}
+              >
+                Afronden
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

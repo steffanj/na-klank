@@ -28,10 +28,10 @@ export default function LoginPage() {
 
   if (submitted) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-stone-50">
-        <div className="max-w-md w-full px-6 py-12 text-center">
-          <h1 className="text-2xl font-serif text-stone-800 mb-4">Controleer uw e-mail</h1>
-          <p className="text-black">
+      <main className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#FFF1E5' }}>
+        <div className="max-w-md w-full text-center">
+          <h1 className="text-2xl text-black mb-4">Controleer uw e-mail</h1>
+          <p className="text-sm text-black">
             We hebben een inloglink gestuurd naar <strong>{email}</strong>. Klik op de link in de e-mail om in te loggen.
           </p>
         </div>
@@ -40,16 +40,16 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-stone-50">
-      <div className="max-w-md w-full px-6 py-12">
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#FFF1E5' }}>
+      <div className="max-w-md w-full">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-serif text-stone-800 mb-2">Na-klank</h1>
+          <h1 className="text-3xl text-black mb-2">Na-klank</h1>
           <p className="text-black text-sm">Een persoonlijk eerbetoon</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm text-stone-700 mb-1">
+            <label htmlFor="email" className="block text-sm text-black mb-1">
               E-mailadres
             </label>
             <input
@@ -58,7 +58,8 @@ export default function LoginPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-stone-300 rounded-lg text-stone-800 bg-white focus:outline-none focus:ring-2 focus:ring-stone-400"
+              className="w-full px-4 py-3 text-sm text-black border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400"
+              style={{ backgroundColor: '#FFF8F2' }}
               placeholder="uw@emailadres.nl"
             />
           </div>
@@ -68,7 +69,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors disabled:opacity-50"
+            className="w-full py-3 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors disabled:opacity-50"
           >
             {loading ? 'Bezig...' : 'Stuur inloglink'}
           </button>

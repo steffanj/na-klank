@@ -271,11 +271,9 @@ export async function finalizeEulogy(formData: FormData) {
 
   const eulogyId = formData.get('eulogy_id') as string
   const spaceId = formData.get('space_id') as string
-  const optIn = formData.get('opt_in_to_collective') === 'true'
-
   await supabase
     .from('eulogies')
-    .update({ status: 'finalized', opt_in_to_collective: optIn, updated_at: new Date().toISOString() })
+    .update({ status: 'finalized', updated_at: new Date().toISOString() })
     .eq('id', eulogyId)
 
   redirect(`/spaces/${spaceId}/eulogy`)

@@ -44,8 +44,7 @@ export default function ContributionForm({ token, firstName }: Props) {
 
       <div>
         <label className="block text-sm text-black mb-1">
-          Jouw naam <span className="text-stone-400 text-xs">(optioneel)</span>
-        </label>
+          Jouw naam        </label>
         <p className="text-xs text-black mb-2">Als je dit invult, kan je naam worden genoemd bij jouw bijdrage. Anoniem meedoen mag ook.</p>
         <input
           type="text"
@@ -57,8 +56,7 @@ export default function ContributionForm({ token, firstName }: Props) {
 
       <div>
         <label className="block text-sm text-black mb-1">
-          Hoe kende je {firstName}? <span className="text-stone-400 text-xs">(optioneel)</span>
-        </label>
+          Hoe kende je {firstName}?        </label>
         <p className="text-xs text-black mb-2">Een paar woorden zijn genoeg. Denk aan de rol waarin je {firstName} kende.</p>
         <input
           type="text"
@@ -71,8 +69,7 @@ export default function ContributionForm({ token, firstName }: Props) {
       {CONTRIBUTION_QUESTIONS.map(q => (
         <div key={q.key}>
           <label className="block text-sm text-black mb-1">
-            {q.label.replace('hem/haar', firstName)} <span className="text-stone-400 text-xs">(optioneel)</span>
-          </label>
+            {q.label.replace('hem/haar', firstName)}          </label>
           {q.subtitle && <p className="text-xs text-black mb-2">{q.subtitle}</p>}
           {q.multiline ? (
             <textarea

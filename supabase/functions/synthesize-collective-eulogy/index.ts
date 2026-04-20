@@ -40,7 +40,7 @@ Liever korter dan verzonnen. Een collectieve eulogie met alleen wat echt gegeven
 Bij veel bijdragen is het onmogelijk en onwenselijk om alles te gebruiken. Je selecteert. Dit zijn de criteria:
 
 - **Specifiek boven algemeen.** Een concreet moment of gebaar weegt zwaarder dan een algemene karakterisering.
-- **Convergentie benutten.** Als meerdere bijdragers onafhankelijk van elkaar hetzelfde noemen, is dat waardevolle informatie over wie de overledene was. Benoem die convergentie expliciet ("bijna iedereen noemt...").
+- **Convergentie benutten.** Als meerdere bijdragers onafhankelijk van elkaar hetzelfde noemen, is dat waardevolle informatie over wie de overledene was. Benoem die convergentie expliciet met een eerlijke kwantificering ("vier bijdragers noemen...", "bij velen van ons") — schrijf nooit "bijna iedereen" of "velen" als dat feitelijk niet klopt.
 - **Variatie in perspectief.** Zorg dat verschillende soorten relaties (familie, collega, buur, vriend) vertegenwoordigd zijn in de tekst. Een eulogie die alleen collega's aan het woord laat, mist breedte.
 - **Welsprekendheid is geen criterium.** Een eenvoudige, kort geformuleerde bijdrage kan net zo waardevol zijn als een uitvoerige. Oordeel op wat er wordt gezegd, niet op hoe mooi.
 
@@ -62,11 +62,11 @@ De collectieve eulogie volgt deze opbouw, zonder kopjes of expliciete markering:
 
 **1. Opening namens het koor.** Een korte, directe aanhef die erkent dat deze woorden uit vele monden komen. Niet plechtig, wel collectief.
 
-**2. Het koor van eigenschappen.** Gebruik de antwoorden op "wat waardeerde je het meest" om de convergentie zichtbaar te maken. Wat kwam steeds terug? Welke woorden werden door velen genoemd? Dit is de kracht van het collectief: waar één stem subjectief is, wordt een koor betrouwbaar. Benoem de terugkerende thema's expliciet.
+**2. Het koor van eigenschappen.** Gebruik de antwoorden op "wat waardeerde je het meest" om de convergentie zichtbaar te maken. Wat kwam steeds terug? Welke woorden werden door hoeveel bijdragers precies genoemd? Dit is de kracht van het collectief: waar één stem subjectief is, wordt een koor betrouwbaar. Benoem de terugkerende thema's expliciet, maar kwantificeer eerlijk ("drie van de vijf bijdragers noemen...", "bij velen van ons" — alleen als dat feitelijk klopt).
 
 **3. Specifieke beelden en momenten.** Gebruik de rijkste bijdragen uit "typisch [naam]" en "moment of beeld". Zet verschillende perspectieven naast elkaar — hoe een buurman hem zag, hoe een collega hem zag, hoe een oude vriend hem zag. Variatie geeft breedte. Waar mogelijk attribueer je ("Haar collega Lucas herinnert zich hoe..."), waar dat niet kan (anonieme bijdragen of wanneer het niet vloeit) laat je de bijdrage zonder attributie staan.
 
-**4. Stemmen.** Een sectie gebaseerd op de antwoorden op "is er iets wat je [naam] nog zou willen zeggen". Dit zijn **directe citaten, geen parafraseringen.** Je mag selecteren welke citaten je opneemt (de meest raakende, de meest representatieve), maar wat je opneemt geef je woordelijk weer, eventueel licht geredigeerd voor leesbaarheid. Leid deze sectie in met iets als: "Sommigen wilden nog iets tegen [naam] zeggen. Hier zijn hun woorden." Deze sectie is de emotionele piek van de eulogie.
+**4. Stemmen.** Een sectie gebaseerd op de antwoorden op "is er iets wat je [naam] nog zou willen zeggen". Dit zijn **directe citaten, geen parafraseringen.** Je mag selecteren welke citaten je opneemt (de meest raakende, de meest representatieve), maar wat je opneemt geef je woordelijk weer, zonder aanpassing. Als een bijdrage onleesbaar is zonder redactie, neem hem dan niet op. Leid deze sectie in met iets als: "Sommigen wilden nog iets tegen [naam] zeggen. Hier zijn hun woorden." Deze sectie is de emotionele piek van de eulogie.
 
 **5. Korte synthese-afsluiting.** Een laatste alinea die de bijdragen samenvoegt tot een collectief afscheid. Niet samenvattend ("zoals we hebben gehoord..."), maar afsluitend: wat blijft, wat nemen we mee.
 
@@ -118,7 +118,7 @@ Geen Engelse uitdrukkingen, geen emoji, geen kopjes, geen opsommingstekens.
 
 ## OMGAAN MET ONGEPASTE BIJDRAGEN
 
-Hoewel bijdragen vooraf door een contactpersoon zijn gemodereerd, kunnen er bijdragen tussen zitten die niet passen in een waardige afscheidstekst: sarcasme, oude pijnpunten, ongepaste grappen, of bijdragen die tegen de toon van de rest ingaan. Als je zo'n bijdrage tegenkomt, gebruik hem niet. Zwijg erover; geef geen meta-commentaar. Het is niet jouw rol om uit te leggen wat je hebt weggelaten.
+Hoewel bijdragen vooraf door een contactpersoon zijn gemodereerd, mocht er toch een bijdrage tussen zitten die evident niet past (sarcasme, rancune, aanvallen op andere nabestaanden), gebruik hem dan niet. Zwijg erover; geef geen meta-commentaar. Het is niet jouw rol om uit te leggen wat je hebt weggelaten.
 
 ---
 
@@ -151,7 +151,14 @@ Pas na deze controle lever je de eulogie.
 
 ## OUTPUT
 
-Begin direct met de tekst. Geen inleiding, geen kopje, geen meta-opmerkingen over de zelf-controle, geen afsluiting met "einde" of een naam. Alleen de tekst die de spreker zal uitspreken.`
+Omsluit je volledige output strikt in deze twee XML-tags, en schrijf niets buiten die tags:
+
+<toespraak>
+[De tekst die de spreker zal uitspreken. Geen inleiding, geen kopje, geen meta-opmerkingen.]
+</toespraak>
+<verantwoording>
+[Per bijdrage (gebruik "Bijdrage N — naam"): wat heb je gebruikt, hoe verwerkt, en waarom? Benoem ook wat je hebt weggelaten en waarom. Dit wordt niet voorgelezen — het is uitsluitend voor de contactpersoon als controle op hallucinaties en attributie.]
+</verantwoording>`
 
 const REVISION_SYSTEM_PROMPT = `Je past een bestaande collectieve eulogie aan op verzoek van de contactpersoon.
 
@@ -181,21 +188,29 @@ Je verzint niets. Geen nieuwe bijvoeglijke naamwoorden, sfeer of details die nie
 
 Uitsluitend in het Nederlands. Begin direct met de herziene eulogie. Geen inleiding, geen meta-opmerkingen, geen kopjes.`
 
-// Keys in collective contributions answers_json
-const CONTRIBUTION_LABELS: Record<string, string> = {
-  typical_trait: 'Wat was er typisch aan hem/haar',
-  most_valued: 'Wat waardeerde je het meest',
-  memory: 'Een moment of beeld dat je bij zult blijven herinneren',
-  catchphrase: 'Een uitspraak of manier van spreken die je is bijgebleven',
-  farewell_message: 'Is er iets wat je hem/haar nog zou willen zeggen',
+// XML field names for collective contributions
+const CONTRIBUTION_XML_KEYS: Record<string, string> = {
+  typical_trait: 'typisch',
+  most_valued: 'meest_gewaardeerd',
+  memory: 'moment_of_beeld',
+  catchphrase: 'uitspraak',
+  farewell_message: 'boodschap',
 }
 
-// Mapping from eulogy intake keys to collective contribution keys (overlapping questions only)
-const EULOGY_TO_COLLECTIVE: Record<string, string> = {
-  typical_trait: 'typical_trait',
-  catchphrase: 'catchphrase',
-  best_memory: 'memory',
-  story: 'memory',
+function escapeXml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function extractXmlTag(text: string, tag: string): string {
+  const open = `<${tag}>`
+  const close = `</${tag}>`
+  const start = text.indexOf(open)
+  const end = text.indexOf(close)
+  if (start === -1 || end === -1) return ''
+  return text.slice(start + open.length, end).trim()
 }
 
 Deno.serve(async (req) => {
@@ -231,21 +246,14 @@ Deno.serve(async (req) => {
       space.deceased_last_name,
     ].filter(Boolean).join(' ')
 
-    // Fetch accepted external contributions
+    // Fetch accepted external contributions, ordered by submission time for stable numbering
     const { data: rawContributions } = await supabase
       .from('collective_eulogy_contributions')
-      .select('contributor_name, relationship_to_deceased, answers_json')
+      .select('contributor_name, relationship_to_deceased, answers_json, submitted_at')
       .eq('memorial_space_id', spaceId)
       .eq('source', 'contributor_link')
       .eq('moderation_status', 'accepted')
-
-    // Fetch finalized opt-in eulogies for derived contributions
-    const { data: optInEulogies } = await supabase
-      .from('eulogies')
-      .select('author_user_id, current_version_id, eulogy_intakes(answers_json)')
-      .eq('memorial_space_id', spaceId)
-      .eq('status', 'finalized')
-      .eq('opt_in_to_collective', true)
+      .order('submitted_at', { ascending: true })
 
     type Contribution = {
       name: string | null
@@ -265,64 +273,36 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Derive contributions from opt-in eulogies
-    for (const e of optInEulogies ?? []) {
-      const intake = Array.isArray(e.eulogy_intakes) ? e.eulogy_intakes[0] : e.eulogy_intakes
-      if (!intake?.answers_json) continue
-      const raw = intake.answers_json as Record<string, string>
-
-      const answers: Record<string, string> = {}
-      for (const [eulogyKey, collectiveKey] of Object.entries(EULOGY_TO_COLLECTIVE)) {
-        if (raw[eulogyKey]?.trim()) {
-          // For memory, concatenate best_memory and story if both present
-          if (collectiveKey === 'memory' && answers['memory']) {
-            answers['memory'] = `${answers['memory']} ${raw[eulogyKey].trim()}`
-          } else {
-            answers[collectiveKey] = raw[eulogyKey].trim()
-          }
+    // Build XML contributions block
+    const xmlLines: string[] = []
+    xmlLines.push('<bijdragen>')
+    contributions.forEach((c, i) => {
+      xmlLines.push(`  <bijdrage nr="${i + 1}">`)
+      xmlLines.push(`    <naam>${escapeXml(c.name ?? 'Anoniem')}</naam>`)
+      if (c.relationship) {
+        xmlLines.push(`    <relatie>${escapeXml(c.relationship)}</relatie>`)
+      }
+      for (const [key, val] of Object.entries(c.answers)) {
+        if (val?.trim()) {
+          const tag = CONTRIBUTION_XML_KEYS[key] ?? key
+          xmlLines.push(`    <${tag}>${escapeXml(val.trim())}</${tag}>`)
         }
       }
+      xmlLines.push(`  </bijdrage>`)
+    })
+    xmlLines.push('</bijdragen>')
 
-      if (Object.keys(answers).length === 0) continue
+    const contributionsXml = xmlLines.join('\n')
 
-      // Fetch author profile for name
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('display_name')
-        .eq('id', e.author_user_id)
-        .maybeSingle()
-
-      contributions.push({
-        name: profile?.display_name ?? null,
-        relationship: raw['relationship'] ?? null,
-        answers,
-      })
-    }
-
-    // Build user message
     const lines: string[] = []
     lines.push(`Schrijf een collectieve eulogie op basis van de onderstaande bijdragen over ${fullName} (roepnaam: ${firstName}).`)
     lines.push(`Alle bijdragen zijn aangeleverd door mensen die ${firstName} kenden en zijn gemodereerd door de contactpersoon.`)
     lines.push('')
     lines.push(`## BIJDRAGEN (${contributions.length} totaal)`)
     lines.push('')
-
-    contributions.forEach((c, i) => {
-      const identity = [
-        c.name ?? 'Anoniem',
-        c.relationship ? `(${c.relationship})` : null,
-      ].filter(Boolean).join(' ')
-
-      lines.push(`### Bijdrage ${i + 1} — ${identity}`)
-      for (const [key, val] of Object.entries(c.answers)) {
-        if (val?.trim()) {
-          lines.push(`${CONTRIBUTION_LABELS[key] ?? key}: ${val.trim()}`)
-        }
-      }
-      lines.push('')
-    })
-
-    lines.push('Schrijf nu de collectieve eulogie. Begin direct met de tekst.')
+    lines.push(contributionsXml)
+    lines.push('')
+    lines.push('Schrijf nu de collectieve eulogie. Omsluit je output in <toespraak> en <verantwoording> tags zoals beschreven.')
 
     const isRevision = !!(currentContent && revisionInstruction)
 
@@ -336,7 +316,7 @@ Deno.serve(async (req) => {
           currentContent,
           ``,
           `## ORIGINELE BIJDRAGEN (ter context — voeg geen nieuwe details toe die hier niet in staan)`,
-          lines.join('\n'),
+          contributionsXml,
           ``,
           `Verander alleen wat de instructie vraagt. Behoud de rest. Begin direct met de herziene eulogie.`,
         ].join('\n')
@@ -346,12 +326,16 @@ Deno.serve(async (req) => {
 
     const message = await anthropic.messages.create({
       model: 'claude-opus-4-7',
-      max_tokens: 8192,
+      max_tokens: 16384,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }],
     })
 
-    const content = message.content[0].type === 'text' ? message.content[0].text : ''
+    const rawOutput = message.content[0].type === 'text' ? message.content[0].text : ''
+
+    // For revision flow, output is plain text (no XML wrapping)
+    const content = isRevision ? rawOutput : extractXmlTag(rawOutput, 'toespraak') || rawOutput
+    const attributionAudit = isRevision ? null : (extractXmlTag(rawOutput, 'verantwoording') || null)
 
     const { data: latestVersion } = await supabase
       .from('collective_eulogy_versions')
@@ -369,6 +353,7 @@ Deno.serve(async (req) => {
         memorial_space_id: spaceId,
         version_number: nextVersion,
         content,
+        attribution_audit_raw: attributionAudit,
       })
       .select('id')
       .single()

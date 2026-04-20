@@ -9,7 +9,22 @@ function fireEdgeFunction(spaceId: string, jobId: string) {
   const admin = createAdminClient()
   admin.functions.invoke('synthesize-collective-eulogy', {
     body: { space_id: spaceId, job_id: jobId },
-  }).catch(() => {})
+  }).catch((err) => console.error('[synthesize-collective-eulogy] invoke error:', err))
+}
+
+export async function resetCollectiveEulogy(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
+  const spaceId = formData.get('space_id') as string
+
+  await supabase
+    .from('collective_eulogies')
+    .update({ status: 'not_started', updated_at: new Date().toISOString() })
+    .eq('memorial_space_id', spaceId)
+
+  revalidatePath(`/spaces/${spaceId}/collective-eulogy`)
 }
 
 export async function ensureToken(spaceId: string): Promise<string> {
@@ -181,6 +196,36 @@ export async function regenerateCollectiveEulogy(formData: FormData) {
   if (job) fireEdgeFunction(spaceId, job.id)
 
   redirect(`/spaces/${spaceId}/collective-eulogy`)
+}
+
+export async function finalizeCollectiveEulogy(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
+  const spaceId = formData.get('space_id') as string
+
+  await supabase
+    .from('collective_eulogies')
+    .update({ status: 'finalized', updated_at: new Date().toISOString() })
+    .eq('memorial_space_id', spaceId)
+
+  revalidatePath(`/spaces/${spaceId}/collective-eulogy`)
+}
+
+export async function reopenCollectiveEulogy(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
+  const spaceId = formData.get('space_id') as string
+
+  await supabase
+    .from('collective_eulogies')
+    .update({ status: 'ready', updated_at: new Date().toISOString() })
+    .eq('memorial_space_id', spaceId)
+
+  revalidatePath(`/spaces/${spaceId}/collective-eulogy`)
 }
 
 export async function reviseCollectiveEulogy(formData: FormData) {

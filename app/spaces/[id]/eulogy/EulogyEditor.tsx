@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { downloadEulogyPdf } from '@/lib/pdf'
 import { autoSaveEulogyEdit, regenerateEulogy, finalizeEulogy, resetEulogy, reopenEulogy, reviseEulogy } from './actions'
 
 const PRESETS = [
@@ -18,18 +19,35 @@ type Props = {
   spaceId: string
   content: string
   status: string
-  optInToCollective: boolean
+  fullName: string
+  authorName: string | null
 }
 
-export default function EulogyEditor({ eulogyId, spaceId, content, status, optInToCollective }: Props) {
+
+export default function EulogyEditor({ eulogyId, spaceId, content, status, fullName, authorName }: Props) {
   const [text, setText] = useState(content)
-  const [optIn, setOptIn] = useState(optInToCollective)
   const [selectedPresets, setSelectedPresets] = useState<Set<string>>(new Set())
   const [freeInstruction, setFreeInstruction] = useState('')
   const [saveStatus, setSaveStatus] = useState<'idle' | 'pending' | 'saving' | 'saved'>('idle')
+  const [copied, setCopied] = useState(false)
   const finalized = status === 'finalized'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const lastSavedText = useRef(content)
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  function handleDownload() {
+    downloadEulogyPdf({
+      fullName,
+      subtitle: authorName ? `Afscheidswoord — ${authorName}` : 'Afscheidswoord',
+      text,
+      filename: `${fullName} — Afscheidswoord.pdf`,
+    })
+  }
 
   function togglePreset(key: string) {
     setSelectedPresets(prev => {
@@ -87,15 +105,35 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
       </div>
 
       {finalized ? (
-        <div className="flex items-center gap-4">
-          <p className="text-sm text-black">Dit afscheidswoord is afgerond.</p>
-          <form action={reopenEulogy} className="inline-flex items-center">
-            <input type="hidden" name="eulogy_id" value={eulogyId} />
-            <input type="hidden" name="space_id" value={spaceId} />
-            <button type="submit" className="text-xs text-black hover:text-black underline">
-              Heropenen
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-black">Dit afscheidswoord is afgerond.</p>
+            <form action={reopenEulogy} className="inline-flex items-center">
+              <input type="hidden" name="eulogy_id" value={eulogyId} />
+              <input type="hidden" name="space_id" value={spaceId} />
+              <button type="submit" className="text-xs text-black hover:text-black underline">
+                Heropenen
+              </button>
+            </form>
+          </div>
+          <div className="flex gap-3 flex-wrap">
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+              style={{ backgroundColor: '#FFF8F2' }}
+            >
+              {copied ? 'Gekopieerd' : 'Kopieer tekst'}
             </button>
-          </form>
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+              style={{ backgroundColor: '#FFF8F2' }}
+            >
+              Download
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-5">
@@ -123,6 +161,23 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
                 Opnieuw genereren
               </button>
             </form>
+
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+              style={{ backgroundColor: '#FFF8F2' }}
+            >
+              {copied ? 'Gekopieerd' : 'Kopieer tekst'}
+            </button>
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+              style={{ backgroundColor: '#FFF8F2' }}
+            >
+              Download
+            </button>
           </div>
 
           <div className="border-t border-stone-200 pt-5">
@@ -169,23 +224,10 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, optIn
             </form>
           </div>
 
-          <div className="border-t border-stone-200 pt-5 space-y-4">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={optIn}
-                onChange={e => setOptIn(e.target.checked)}
-                className="mt-0.5 shrink-0"
-              />
-              <span className="text-sm text-black">
-                Deel mijn herinneringen voor het gezamenlijk afscheidswoord
-              </span>
-            </label>
-
+          <div className="border-t border-stone-200 pt-5">
             <form action={finalizeEulogy}>
               <input type="hidden" name="eulogy_id" value={eulogyId} />
               <input type="hidden" name="space_id" value={spaceId} />
-              <input type="hidden" name="opt_in_to_collective" value={String(optIn)} />
               <button
                 type="submit"
                 className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"

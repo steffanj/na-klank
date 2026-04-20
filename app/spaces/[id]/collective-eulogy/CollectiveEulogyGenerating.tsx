@@ -3,13 +3,15 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useGenerationJob } from '@/hooks/use-generation-job'
+import { resetCollectiveEulogy } from './actions'
 
 type Props = {
   jobId: string | null
   spaceId: string
+  isUpdate: boolean
 }
 
-export default function CollectiveEulogyGenerating({ jobId, spaceId }: Props) {
+export default function CollectiveEulogyGenerating({ jobId, spaceId, isUpdate }: Props) {
   const job = useGenerationJob(jobId)
   const router = useRouter()
 
@@ -46,8 +48,14 @@ export default function CollectiveEulogyGenerating({ jobId, spaceId }: Props) {
           <div className="flex justify-center mb-5">
             <div className="w-8 h-8 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
           </div>
-          <p className="text-black mb-2">Gezamenlijk afscheidswoord wordt opgesteld…</p>
-          <p className="text-sm text-black">Dit kan een paar minuten duren.</p>
+          <p className="text-black mb-2">{isUpdate ? 'Gezamenlijk afscheidswoord wordt bijgewerkt…' : 'Gezamenlijk afscheidswoord wordt opgesteld…'}</p>
+          <p className="text-sm text-black mb-6">Dit kan een paar minuten duren.</p>
+          <form action={resetCollectiveEulogy}>
+            <input type="hidden" name="space_id" value={spaceId} />
+            <button type="submit" className="text-xs text-black underline hover:text-stone-500 transition-colors">
+              Vastgelopen? Klik hier om opnieuw te proberen
+            </button>
+          </form>
         </>
       )}
     </div>
