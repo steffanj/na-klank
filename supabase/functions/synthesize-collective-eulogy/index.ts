@@ -197,6 +197,114 @@ const CONTRIBUTION_XML_KEYS: Record<string, string> = {
   farewell_message: 'boodschap',
 }
 
+const VERIFIER_SYSTEM_PROMPT = `Je controleert een gegenereerde collectieve eulogie op claims die niet aantoonbaar in de aangeleverde bijdragen staan.
+
+Jouw taak is specifiek en beperkt. Je controleert uitsluitend:
+
+1. **Directe citaten** — Als iemand geciteerd wordt ("Zo zei hij dat altijd"), staan die woorden of een duidelijk herkenbare parafrase in die persoons bijdrage?
+
+2. **Toeschrijvingen aan personen** — Als de tekst zegt "Haar collega Lucas herinnert zich hoe...", staat dat gegeven inderdaad in de bijdrage van iemand die Lucas heet?
+
+3. **Convergentie-claims** — Als de tekst zegt "vier bijdragers noemen...", zijn het er ook echt vier? Kloppen kwantificerende uitspraken als "velen", "meerdere bijdragers", "bij velen van ons"?
+
+4. **Specifieke details** — Feiten, gebeurtenissen of details die aan een specifieke persoon worden toegeschreven: staan die in diens bijdrage?
+
+Wat je NIET controleert:
+- Stijl, toon of opbouw van de tekst
+- Algemene beschrijvingen die niet aan een specifieke persoon zijn toegeschreven
+- Of de eulogie goed of slecht is
+
+## OUTPUT
+
+Als alles klopt:
+<verificatie>
+  <status>goedgekeurd</status>
+</verificatie>
+
+Als er problemen zijn:
+<verificatie>
+  <status>issues_found</status>
+  <bevindingen>
+    <bevinding>
+      <zin>[De exacte problematische zin of passage uit de toespraak]</zin>
+      <probleem>[Wat er niet klopt en waarom]</probleem>
+      <actie>verwijder</actie>
+    </bevinding>
+  </bevindingen>
+</verificatie>
+
+Gebruik actie "verwijder" als de zin niet gered kan worden. Gebruik actie "pas_aan" met een concrete suggestie als een kleine aanpassing voldoende is.
+
+Wees precies en streng. Geef alleen echte problemen door — geen twijfels, geen stijlkritiek. Als je het niet met zekerheid kunt weerleggen, is het geen bevinding.`
+
+const CORRECTOR_SYSTEM_PROMPT = `Je past een collectieve eulogie aan op basis van een lijst concrete bevindingen van een verificateur.
+
+Jouw taak:
+- Verwijder of corrigeer uitsluitend de zinnen die zijn aangemerkt in de bevindingen
+- Raak de rest van de tekst niet aan
+- Voeg geen nieuwe informatie toe
+- Als het weghalen van een zin de omringende tekst onvloeiend maakt, pas je maximaal één of twee aangrenzende zinnen aan voor leesbaarheid — zonder nieuwe feiten toe te voegen
+
+Begin direct met de gecorrigeerde tekst. Geen inleiding, geen uitleg, geen XML-tags.`
+
+type VerificationPass = {
+  pass: number
+  status: 'goedgekeurd' | 'issues_found'
+  bevindingen: string
+}
+
+async function runVerificationLoop(
+  initialSpeech: string,
+  verantwoording: string | null,
+  contributionsXml: string,
+  anthropicClient: Anthropic,
+): Promise<{ speech: string; log: VerificationPass[] }> {
+  let speech = initialSpeech
+  const log: VerificationPass[] = []
+
+  for (let pass = 1; pass <= 2; pass++) {
+    const verifierUserMsg = [
+      `## BIJDRAGEN (grondwaarheid)\n\n${contributionsXml}`,
+      `\n\n## TOESPRAAK\n\n${speech}`,
+      pass === 1 && verantwoording ? `\n\n## VERANTWOORDING VAN DE AUTEUR\n\n${verantwoording}` : '',
+      `\n\nVerifieer de toespraak aan de hand van de bijdragen.`,
+    ].join('')
+
+    const verifierResponse = await anthropicClient.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 2048,
+      system: VERIFIER_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: verifierUserMsg }],
+    })
+
+    const verifierRaw = verifierResponse.content[0].type === 'text' ? verifierResponse.content[0].text : ''
+    const status = extractXmlTag(verifierRaw, 'status') === 'goedgekeurd' ? 'goedgekeurd' : 'issues_found'
+    const bevindingen = status === 'issues_found' ? extractXmlTag(verifierRaw, 'bevindingen') : ''
+
+    log.push({ pass, status, bevindingen })
+
+    if (status === 'goedgekeurd') break
+
+    const correctorUserMsg = [
+      `## TOESPRAAK\n\n${speech}`,
+      `\n\n## BEVINDINGEN\n\n${bevindingen}`,
+      `\n\n## BIJDRAGEN (grondwaarheid)\n\n${contributionsXml}`,
+      `\n\nCorrigeer de toespraak op basis van de bevindingen.`,
+    ].join('')
+
+    const correctorResponse = await anthropicClient.messages.create({
+      model: 'claude-opus-4-7',
+      max_tokens: 16384,
+      system: CORRECTOR_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: correctorUserMsg }],
+    })
+
+    speech = correctorResponse.content[0].type === 'text' ? correctorResponse.content[0].text : speech
+  }
+
+  return { speech, log }
+}
+
 function escapeXml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -333,9 +441,21 @@ Deno.serve(async (req) => {
 
     const rawOutput = message.content[0].type === 'text' ? message.content[0].text : ''
 
-    // For revision flow, output is plain text (no XML wrapping)
-    const content = isRevision ? rawOutput : extractXmlTag(rawOutput, 'toespraak') || rawOutput
-    const attributionAudit = isRevision ? null : (extractXmlTag(rawOutput, 'verantwoording') || null)
+    let content: string
+    let attributionAudit: string | null
+    let verificationLog: VerificationPass[] | null = null
+
+    if (isRevision) {
+      content = rawOutput
+      attributionAudit = null
+    } else {
+      const initialSpeech = extractXmlTag(rawOutput, 'toespraak') || rawOutput
+      attributionAudit = extractXmlTag(rawOutput, 'verantwoording') || null
+
+      const verified = await runVerificationLoop(initialSpeech, attributionAudit, contributionsXml, anthropic)
+      content = verified.speech
+      verificationLog = verified.log
+    }
 
     const { data: latestVersion } = await supabase
       .from('collective_eulogy_versions')
@@ -354,6 +474,7 @@ Deno.serve(async (req) => {
         version_number: nextVersion,
         content,
         attribution_audit_raw: attributionAudit,
+        verification_log: verificationLog ? JSON.stringify(verificationLog) : null,
       })
       .select('id')
       .single()
