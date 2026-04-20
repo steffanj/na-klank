@@ -2,10 +2,23 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SpaceCard } from './space-card'
 
+async function logout() {
+  'use server'
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect('/auth/login')
+}
+
 export default async function DirectorDashboard() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', user.id)
+    .single()
 
   const { data: spaces } = await supabase
     .from('memorial_spaces')
@@ -27,12 +40,22 @@ export default async function DirectorDashboard() {
             <h1 className="text-3xl text-black">Na-klank</h1>
             <p className="text-black text-sm mt-1">Uitvaartbegeleider dashboard</p>
           </div>
-          <a
-            href="/director/spaces/new"
-            className="px-5 py-2.5 bg-stone-800 text-white text-sm rounded-lg hover:bg-stone-700 transition-colors"
-          >
-            + Nieuwe ruimte
-          </a>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-black">Ingelogd als: {profile?.display_name || user.email}</span>
+              <form action={logout}>
+                <button type="submit" className="text-xs text-black hover:underline">
+                  Uitloggen
+                </button>
+              </form>
+            </div>
+            <a
+              href="/director/spaces/new"
+              className="px-5 py-2.5 bg-stone-800 text-white text-sm rounded-lg hover:bg-stone-700 transition-colors"
+            >
+              + Nieuwe ruimte
+            </a>
+          </div>
         </div>
 
         {!spaces || spaces.length === 0 ? (
