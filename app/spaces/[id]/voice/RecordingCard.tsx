@@ -50,8 +50,8 @@ export default function RecordingCard({
     await deleteVoiceRecording(fd)
   }
 
-  const date = new Date(recording.created_at).toLocaleDateString('nl-NL', {
-    day: 'numeric', month: 'long', year: 'numeric',
+  const date = new Date(recording.created_at).toLocaleString('nl-NL', {
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   })
 
   return (
