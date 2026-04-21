@@ -29,6 +29,18 @@ export default function RecordingCard({
 }) {
   const [deleting, setDeleting] = useState(false)
 
+  async function handleDownload() {
+    if (!recording.result_url) return
+    const res = await fetch(recording.result_url)
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `opname-${recording.id}.mp3`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   async function handleDelete() {
     if (!confirm('Weet je zeker dat je deze opname wilt verwijderen?')) return
     setDeleting(true)
@@ -62,12 +74,21 @@ export default function RecordingCard({
       </div>
 
       {recording.status === 'done' && recording.result_url ? (
-        <audio
-          controls
-          src={recording.result_url}
-          className="w-full h-10"
-          style={{ accentColor: '#292524' }}
-        />
+        <div className="space-y-2">
+          <audio
+            controls
+            src={recording.result_url}
+            className="w-full h-10"
+            style={{ accentColor: '#292524' }}
+          />
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="text-xs text-black underline"
+          >
+            Download
+          </button>
+        </div>
       ) : recording.status === 'failed' ? (
         <p className="text-xs text-red-600">Genereren mislukt.</p>
       ) : (
