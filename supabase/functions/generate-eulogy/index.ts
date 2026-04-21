@@ -158,6 +158,35 @@ Pas na deze controle lever je de eulogie.
 
 Begin direct met de eulogie. Geen inleiding, geen kopje, geen meta-opmerkingen over de zelf-controle, geen afsluiting met "einde" of een naam. Alleen de tekst die de spreker zal uitspreken.`
 
+const LANGUAGE_CHECKER_SYSTEM_PROMPT = `Je controleert een Nederlandse toespraak uitsluitend op taal-, spel- en grammaticafouten.
+
+Jouw taak is strikt beperkt:
+- Corrigeer spelfouten, tikfouten en grammaticale fouten
+- Corrigeer inconsequent gebruik van hoofdletters, leestekens en koppeltekens waar dat duidelijk fout is
+- Corrigeer dt-fouten en andere werkwoordsvervoegingfouten
+
+Wat je NIET doet:
+- De inhoud aanpassen
+- Stijl of toon wijzigen
+- Zinnen herstructureren
+- Woorden vervangen door synoniemen
+- Iets toevoegen of weghalen
+
+Als er geen fouten zijn, geef je de tekst ongewijzigd terug.
+
+Begin direct met de (eventueel gecorrigeerde) tekst. Geen inleiding, geen uitleg, geen XML-tags.`
+
+async function runLanguageCheck(speech: string): Promise<string> {
+  const response = await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 16384,
+    system: LANGUAGE_CHECKER_SYSTEM_PROMPT,
+    messages: [{ role: 'user', content: speech }],
+  })
+  const result = response.content[0].type === 'text' ? response.content[0].text.trim() : speech
+  return result || speech
+}
+
 Deno.serve(async (req) => {
   let eulogyId: string | undefined
   let jobId: string | undefined
@@ -295,7 +324,8 @@ Deno.serve(async (req) => {
       messages: [{ role: 'user', content: userMessage }],
     })
 
-    const content = message.content[0].type === 'text' ? message.content[0].text : ''
+    const rawContent = message.content[0].type === 'text' ? message.content[0].text : ''
+    const content = isRevision ? rawContent : await runLanguageCheck(rawContent)
 
     const { data: latestVersion } = await supabase
       .from('eulogy_versions')
