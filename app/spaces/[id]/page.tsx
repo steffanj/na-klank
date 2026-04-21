@@ -102,8 +102,13 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
 
         <Toelichting>
           <p>Welkom bij de herdenkingspagina voor {name}. Via de modules hieronder kun je op verschillende manieren een eerbetoon samenstellen.</p>
-          <p><strong>Afscheidswoord</strong> — schrijf een persoonlijk eerbetoon met begeleiding van Na-klank. <strong>Gezamenlijk afscheidswoord</strong> — nodig familie en vrienden uit om herinneringen te delen en laat Na-klank daar één tekst van maken. <strong>Foto's</strong> — verbeter, kleur of vertaal foto's naar een artistieke stijl. <strong>Voorlezen</strong> — laat een afscheidswoord voorlezen door een synthetische stem.</p>
-          {canManageMembers && <p>Als primair contact kun je familieleden uitnodigen via het formulier onderaan deze pagina.</p>}
+          <p>
+            <strong>Afscheidswoord</strong> — schrijf, met begeleiding, een persoonlijk eerbetoon.<br />
+            <strong>Gezamenlijk afscheidswoord</strong> — nodig familie en vrienden uit om herinneringen te delen en laat deze samenvoegen tot één tekst.<br />
+            <strong>Foto's</strong> — verbeter, kleur of vertaal foto's naar een artistieke stijl.<br />
+            <strong>Voorlezen</strong> — laat een afscheidswoord voorlezen door een synthetische stem.
+          </p>
+          {canManageMembers && <p>Als hoofd-contactpersoon kun je familieleden uitnodigen via het formulier onderaan deze pagina.</p>}
         </Toelichting>
         <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4 flex items-center justify-between">
           Modules
