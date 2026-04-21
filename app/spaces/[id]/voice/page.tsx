@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation'
 import { PRESET_VOICES } from '@/lib/config/voice'
 import VoiceModule from './VoiceModule'
 import VoicePoller from './VoicePoller'
+import Toelichting from '@/app/components/Toelichting'
 
 async function signedUrl(bucket: string, path: string): Promise<string> {
   const admin = createAdminClient()
@@ -133,6 +134,11 @@ export default async function VoicePage({ params }: { params: Promise<{ id: stri
           <p className="text-sm text-black mt-1">Voorlezen</p>
         </div>
 
+        <Toelichting>
+          <p>Met deze tool laat je een afscheidswoord voorlezen in een synthetische stem.</p>
+          <p>Kies een stem uit de lijst met beschikbare stemmen en beluister een kort voorbeeld. Selecteer daarna het afscheidswoord dat je wilt laten voorlezen — je persoonlijke afscheidswoord of het gezamenlijke afscheidswoord. Na-klank genereert een volledige geluidsopname die je kunt beluisteren en downloaden.</p>
+          <p>Eerdere opnamen vind je onderaan de pagina onder <em>Mijn opnamen</em>.</p>
+        </Toelichting>
         <VoicePoller hasProcessing={hasProcessing} />
 
         <VoiceModule

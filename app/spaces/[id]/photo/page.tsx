@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation'
 import PhotoUpload from './PhotoUpload'
 import PhotoCard from './PhotoCard'
 import PhotoPoller from './PhotoPoller'
+import Toelichting from '@/app/components/Toelichting'
 
 type Artwork = {
   id: string
@@ -72,6 +73,11 @@ export default async function PhotoPage({ params }: { params: Promise<{ id: stri
           <p className="text-sm text-black mt-1">Foto's</p>
         </div>
 
+        <Toelichting>
+          <p>Met deze tool verbeter je foto's van {name} met behulp van AI.</p>
+          <p>Je kunt kiezen uit drie bewerkingen: <strong>Kwaliteit verbeteren</strong> — vergroot de scherpte en resolutie van wazige of beschadigde foto's; <strong>Inkleuren</strong> — voeg kleur toe aan zwart-witfoto's; <strong>Artistieke stijl</strong> — vertaal een foto naar een geschilderde of getekende stijl.</p>
+          <p>Upload een foto, kies een bewerking en wacht tot het resultaat klaar is. Je kunt het daarna downloaden.</p>
+        </Toelichting>
         <PhotoPoller hasProcessing={hasProcessing} />
         <PhotoUpload spaceId={id} />
 

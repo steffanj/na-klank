@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
+import Toelichting from '@/app/components/Toelichting'
 import { ensureToken } from './actions'
 import ContributionList from './ContributionList'
 import CollectiveEulogyGenerating from './CollectiveEulogyGenerating'
@@ -74,6 +75,11 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
             <h1 className="text-3xl text-black">Gezamenlijk afscheidswoord</h1>
             <p className="text-black text-sm mt-1">{fullName}</p>
           </div>
+          <Toelichting>
+            <p>Met deze tool stel je samen met familie en vrienden een gezamenlijk afscheidswoord op voor {firstName}.</p>
+            <p>Als primair contact stuur je een deellink naar naasten. Via die link kunnen zij hun herinneringen en gedachten over {firstName} achterlaten — anoniem of met naam. Je modereert de bijdragen en bepaalt welke worden meegenomen. Na-klank verweeft de geaccepteerde bijdragen daarna tot één samenhangende tekst.</p>
+            <p>Het resultaat kan achteraf nog worden bewerkt, opnieuw gegenereerd of worden verfijnd via een herziening-instructie.</p>
+          </Toelichting>
           {children}
         </div>
       </main>
