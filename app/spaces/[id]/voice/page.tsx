@@ -137,11 +137,9 @@ export default async function VoicePage({ params }: { params: Promise<{ id: stri
 
         <VoiceModule
           spaceId={id}
-          userId={user.id}
           eulogyText={eulogyText}
           eulogyVersionId={eulogyVersionId}
           collectiveEulogyText={collectiveEulogyText}
-          clonedVoices={clonedVoices ?? []}
           recordings={recordings}
         />
       </div>
