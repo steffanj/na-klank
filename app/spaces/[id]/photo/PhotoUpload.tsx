@@ -5,25 +5,26 @@ import { useRouter } from 'next/navigation'
 import { uploadPhoto } from './actions'
 
 const TOOLS = [
-  { category: 'restoration', style: 'enhance', label: 'Restaureren', description: 'Herstel beschadigde of vervaagde foto\'s én kleur ze in. Krassen, vlekken en scheuren worden verwijderd en zwart-witfoto\'s krijgen automatisch kleur.', canUpscale: true },
-  { category: 'upscale', style: 'upscale', label: 'Vergroten', description: 'Vergroot foto\'s zonder kwaliteitsverlies. Geschikt om kleine foto\'s groter te maken, of grote foto\'s verder te vergroten voor afdruk op groot formaat.', canUpscale: false },
-  { category: 'remove_background', style: 'remove_background', label: 'Achtergrond verwijderen', description: 'Verwijder de achtergrond van een foto zodat alleen het onderwerp overblijft, op een witte achtergrond.', canUpscale: false },
-  { category: 'artistic', style: '', label: 'Artistieke stijl', description: 'Vertaal een foto naar een schilderij of tekening in een gekozen kunststijl, zoals olieverf, aquarel of potlood.', canUpscale: true },
+  { category: 'restoration', style: 'enhance', label: 'Restaureren', description: 'Herstel beschadigde of vervaagde foto\'s én kleur ze in. Krassen, vlekken en scheuren worden verwijderd en zwart-witfoto\'s krijgen automatisch kleur.' },
+  { category: 'upscale', style: 'upscale', label: 'Vergroten', description: 'Vergroot foto\'s zonder kwaliteitsverlies. Geschikt om kleine foto\'s groter te maken, of grote foto\'s verder te vergroten voor afdruk op groot formaat.' },
+  { category: 'remove_background', style: 'remove_background', label: 'Achtergrond verwijderen', description: 'Verwijder de achtergrond van een foto zodat alleen het onderwerp overblijft, op een witte achtergrond.' },
+  { category: 'artistic', style: '', label: 'Artistieke stijl', description: 'Vertaal een foto naar een schilderij of tekening in een gekozen kunststijl, zoals olieverf, aquarel of potlood.' },
 ]
 
 const ARTISTIC_STYLES = [
-  { key: 'olieverf', label: 'Olieverfschilderij' },
+  { key: 'olieverf', label: 'Olieverf' },
+  { key: 'impressionisme', label: 'Impressionistisch' },
   { key: 'aquarel', label: 'Aquarel' },
-  { key: 'potlood', label: 'Potloodschets' },
+  { key: 'potlood', label: 'Potlood' },
   { key: 'vintage', label: 'Vintage poster' },
-  { key: 'impressionisme', label: 'Impressionisme' },
+  { key: 'sepia', label: 'Sepia' },
+  { key: 'zwart_wit', label: 'Zwart/wit' },
 ]
 
 export default function PhotoUpload({ spaceId }: { spaceId: string }) {
   const router = useRouter()
   const [selectedTool, setSelectedTool] = useState<(typeof TOOLS)[0] | null>(null)
   const [artisticStyle, setArtisticStyle] = useState('olieverf')
-  const [upscale, setUpscale] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -37,7 +38,6 @@ export default function PhotoUpload({ spaceId }: { spaceId: string }) {
   function resetForm() {
     setSelectedTool(null)
     setArtisticStyle('olieverf')
-    setUpscale(false)
     setPreview(null)
     if (fileRef.current) fileRef.current.value = ''
   }
@@ -50,14 +50,15 @@ export default function PhotoUpload({ spaceId }: { spaceId: string }) {
     fd.set('space_id', spaceId)
     fd.set('category', selectedTool.category)
     fd.set('style', selectedTool.category === 'artistic' ? artisticStyle : selectedTool.style)
-    fd.set('upscale', String(upscale))
     fd.set('photo', fileRef.current.files[0])
     const result = await uploadPhoto(fd)
-    // only reached on error — success triggers redirect from server action
     setSubmitting(false)
     if (result?.error) {
       setErrorMsg(result.error)
+      return
     }
+    resetForm()
+    router.refresh()
   }
 
   return (
@@ -74,7 +75,7 @@ export default function PhotoUpload({ spaceId }: { spaceId: string }) {
             <button
               key={tool.style || tool.category}
               type="button"
-              onClick={() => { setSelectedTool(tool); setUpscale(false) }}
+              onClick={() => setSelectedTool(tool)}
               className={`text-left px-4 py-3 rounded-xl border transition-colors ${
                 isSelected
                   ? 'border-stone-800 bg-stone-800 text-white'
@@ -92,7 +93,7 @@ export default function PhotoUpload({ spaceId }: { spaceId: string }) {
       </div>
 
       {selectedTool?.category === 'artistic' && (
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
           {ARTISTIC_STYLES.map(s => (
             <button
               key={s.key}
@@ -109,18 +110,6 @@ export default function PhotoUpload({ spaceId }: { spaceId: string }) {
             </button>
           ))}
         </div>
-      )}
-
-      {selectedTool?.canUpscale && (
-        <label className="flex items-center gap-2 mb-4 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={upscale}
-            onChange={e => setUpscale(e.target.checked)}
-            className="rounded border-stone-400"
-          />
-          <span className="text-xs text-black">Ook vergroten (upscale)</span>
-        </label>
       )}
 
       {selectedTool && (

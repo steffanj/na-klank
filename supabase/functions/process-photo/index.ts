@@ -15,6 +15,8 @@ const ARTISTIC_STYLE_PROMPTS: Record<string, string> = {
   potlood: 'Transform this photo into a detailed pencil sketch with fine linework and subtle shading. Keep all subjects and composition identical.',
   vintage: 'Transform this photo into a vintage poster illustration with a warm sepia-toned color palette and retro graphic style. Keep all subjects and composition identical.',
   impressionisme: 'Transform this photo into an impressionist painting in the style of Monet with visible expressive brushstrokes and soft light. Keep all subjects and composition identical.',
+  sepia: 'Convert this photo to a warm sepia tone. Render the image in brown-golden greyscale tones as if it were an old historical photograph. Do not alter the composition, subjects, or any other aspect of the image.',
+  zwart_wit: 'Convert this photo to black and white. Remove all color and render the image in greyscale tones. Do not alter the composition, subjects, or any other aspect of the image.',
 }
 
 async function toBase64DataUrl(buf: ArrayBuffer, mimeType: string): Promise<string> {

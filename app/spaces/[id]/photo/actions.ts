@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath } from 'next/cache' // redirect still used by deleteArtwork indirectly via auth check
 
 function fireEdgeFunction(artworkId: string, spaceId: string) {
   const admin = createAdminClient()
@@ -20,7 +20,6 @@ export async function uploadPhoto(formData: FormData): Promise<{ error?: string 
   const spaceId = formData.get('space_id') as string
   const category = formData.get('category') as string
   const style = formData.get('style') as string
-  const upscale = formData.get('upscale') === 'true'
   const file = formData.get('photo') as File
 
   if (!file || file.size === 0) return { error: 'Geen bestand geselecteerd' }
@@ -50,7 +49,6 @@ export async function uploadPhoto(formData: FormData): Promise<{ error?: string 
       original_storage_path: originalPath,
       category,
       style,
-      upscale,
     })
     .select('id')
     .single()
@@ -61,7 +59,8 @@ export async function uploadPhoto(formData: FormData): Promise<{ error?: string 
   }
 
   fireEdgeFunction(artwork.id, spaceId)
-  redirect(`/spaces/${spaceId}/photo`)
+  revalidatePath(`/spaces/${spaceId}/photo`)
+  return {}
 }
 
 export async function deleteArtwork(formData: FormData) {

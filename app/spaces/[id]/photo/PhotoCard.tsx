@@ -6,11 +6,13 @@ const TOOL_LABELS: Record<string, string> = {
   'restoration/enhance': 'Gerestaureerd',
   'upscale/upscale': 'Vergroot',
   'remove_background/remove_background': 'Achtergrond verwijderd',
-  'artistic/olieverf': 'Olieverfschilderij',
+  'artistic/olieverf': 'Olieverf',
   'artistic/aquarel': 'Aquarel',
-  'artistic/potlood': 'Potloodschets',
+  'artistic/potlood': 'Potlood',
   'artistic/vintage': 'Vintage poster',
-  'artistic/impressionisme': 'Impressionisme',
+  'artistic/impressionisme': 'Impressionistisch',
+  'artistic/sepia': 'Sepia',
+  'artistic/zwart_wit': 'Zwart/wit',
 }
 
 type Props = {
@@ -55,6 +57,7 @@ export default function PhotoCard({ artwork, spaceId }: Props) {
             src={displayUrl}
             alt={label}
             className="w-full aspect-square object-cover"
+            loading="lazy"
           />
         ) : (
           <div
@@ -65,6 +68,7 @@ export default function PhotoCard({ artwork, spaceId }: Props) {
               src={artwork.original_url}
               alt="Origineel"
               className="w-full h-full absolute inset-0 object-cover opacity-30"
+              loading="lazy"
             />
             <div className="relative z-10 text-center px-4">
               {artwork.status === 'failed' ? (
@@ -83,9 +87,6 @@ export default function PhotoCard({ artwork, spaceId }: Props) {
       <div className="px-4 py-3 flex items-center justify-between">
         <div>
           <p className="text-xs text-black">{label}</p>
-          {artwork.upscale && artwork.category !== 'upscale' && (
-            <p className="text-xs text-stone-500">+ vergroot</p>
-          )}
         </div>
         <div className="flex items-center gap-3">
           {artwork.status === 'done' && artwork.result_url && (
