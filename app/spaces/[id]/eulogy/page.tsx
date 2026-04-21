@@ -47,7 +47,7 @@ export default async function EulogyPage({ params }: { params: Promise<{ id: str
           </div>
           <Toelichting>
             <p>Met deze tool stel je een persoonlijk afscheidswoord op voor {firstName}.</p>
-            <p>Je beantwoordt een reeks vragen over {firstName} — over zijn of haar leven, karakter en herinneringen. Op basis van je antwoorden stelt Na-klank een eerste versie op. Je kunt de tekst daarna zelf aanpassen, opnieuw laten genereren of verfijnen met een herziening-instructie.</p>
+            <p>Je beantwoordt een reeks vragen over {firstName} — over zijn of haar leven, karakter en herinneringen. Op basis van je antwoorden wordt een eerste versie van een afscheidswoord gegenereerd. Je kunt de tekst daarna opnieuw laten genereren, verfijnen met een herziening-instructie of handmatig aanpassen.</p>
             <p>Het afscheidswoord is alleen voor jou zichtbaar en kan ook worden voorgelezen via de module <em>Voorlezen</em>.</p>
           </Toelichting>
           {children}
