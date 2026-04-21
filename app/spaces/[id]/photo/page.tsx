@@ -74,8 +74,13 @@ export default async function PhotoPage({ params }: { params: Promise<{ id: stri
         </div>
 
         <Toelichting>
-          <p>Met deze tool verbeter je foto's van {name} met behulp van AI.</p>
-          <p>Je kunt kiezen uit drie bewerkingen: <strong>Kwaliteit verbeteren</strong> — vergroot de scherpte en resolutie van wazige of beschadigde foto's; <strong>Inkleuren</strong> — voeg kleur toe aan zwart-witfoto's; <strong>Artistieke stijl</strong> — vertaal een foto naar een geschilderde of getekende stijl.</p>
+          <p>Met deze tool bewerk je foto's van {name} met behulp van AI. Je kunt kiezen uit vier bewerkingen:</p>
+          <p>
+            <strong>Restaureren</strong> — herstel beschadigde of vervaagde foto's én kleur ze in.<br />
+            <strong>Vergroten</strong> — vergroot foto's zonder kwaliteitsverlies, geschikt voor afdruk op groot formaat.<br />
+            <strong>Achtergrond verwijderen</strong> — verwijder de achtergrond zodat alleen het onderwerp overblijft.<br />
+            <strong>Artistieke stijl</strong> — vertaal een foto naar een schilderij of tekening in een gekozen kunststijl.
+          </p>
           <p>Upload een foto, kies een bewerking en wacht tot het resultaat klaar is. Je kunt het daarna downloaden.</p>
         </Toelichting>
         <PhotoPoller hasProcessing={hasProcessing} />
