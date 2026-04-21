@@ -39,6 +39,7 @@ export default async function PhotoPage({ params }: { params: Promise<{ id: stri
 
   if (!space) notFound()
 
+  const firstName = space.deceased_first_name
   const name = [
     space.deceased_first_name,
     space.deceased_nickname ? `"${space.deceased_nickname}"` : null,
@@ -74,7 +75,7 @@ export default async function PhotoPage({ params }: { params: Promise<{ id: stri
         </div>
 
         <Toelichting>
-          <p>Met deze tool bewerk je foto's van {name} met behulp van AI. Je kunt kiezen uit vier bewerkingen:</p>
+          <p>Met deze tool bewerk je foto's van {firstName} met behulp van AI. Je kunt kiezen uit vier bewerkingen:</p>
           <p>
             <strong>Restaureren</strong> — herstel beschadigde of vervaagde foto's én kleur ze in.<br />
             <strong>Vergroten</strong> — vergroot foto's zonder kwaliteitsverlies, geschikt voor afdruk op groot formaat.<br />

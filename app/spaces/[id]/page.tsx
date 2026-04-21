@@ -79,6 +79,7 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
   const isDirector = space.created_by === user.id
   const canManageMembers = isPrimaryContact || isDirector
 
+  const firstName = space.deceased_first_name
   const name = [
     space.deceased_first_name,
     space.deceased_nickname ? `"${space.deceased_nickname}"` : null,
@@ -101,7 +102,7 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
         </div>
 
         <Toelichting>
-          <p>Welkom bij de herdenkingspagina voor {name}. Via de modules hieronder kun je op verschillende manieren een eerbetoon samenstellen.</p>
+          <p>Welkom bij de herdenkingspagina voor {firstName}. Via de modules hieronder kun je op verschillende manieren een eerbetoon samenstellen.</p>
           <p>
             <strong>Afscheidswoord</strong> — schrijf, met begeleiding, een persoonlijk eerbetoon.<br />
             <strong>Gezamenlijk afscheidswoord</strong> — nodig familie en vrienden uit om herinneringen te delen en laat deze samenvoegen tot één tekst.<br />

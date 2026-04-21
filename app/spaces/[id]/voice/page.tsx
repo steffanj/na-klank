@@ -26,6 +26,7 @@ export default async function VoicePage({ params }: { params: Promise<{ id: stri
 
   if (!space) notFound()
 
+  const firstName = space.deceased_first_name
   const name = [
     space.deceased_first_name,
     space.deceased_nickname ? `"${space.deceased_nickname}"` : null,
