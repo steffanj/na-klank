@@ -62,7 +62,7 @@ export default async function VoicePage({ params }: { params: Promise<{ id: stri
     .from('collective_eulogies')
     .select('current_version_id, status')
     .eq('memorial_space_id', id)
-    .eq('status', 'ready')
+    .in('status', ['ready', 'finalized'])
     .maybeSingle()
 
   let collectiveEulogyText: string | null = null
