@@ -89,13 +89,25 @@ export default function VoiceModule({
   }
 
   async function handlePreview() {
-    if (!activeText.trim()) return
-    setPreviewState('loading')
     setPreviewError('')
-    if (previewUrl) {
+    if (previewUrl && previewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(previewUrl)
       setPreviewUrl(null)
     }
+
+    // Preset voice: play the pre-generated static sample — no API call
+    if (selectedVoiceSource === 'preset') {
+      const preset = PRESET_VOICES.find(v => v.id === selectedVoiceId)
+      if (preset) {
+        setPreviewUrl(preset.previewPath)
+        setPreviewState('ready')
+      }
+      return
+    }
+
+    // Cloned voice: call ElevenLabs with a short excerpt
+    if (!activeText.trim()) return
+    setPreviewState('loading')
 
     const res = await fetch(`/api/spaces/${spaceId}/voice/preview`, {
       method: 'POST',
