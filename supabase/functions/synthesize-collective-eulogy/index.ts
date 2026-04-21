@@ -360,6 +360,7 @@ Deno.serve(async (req) => {
     jobId = body.job_id
     const currentContent: string | undefined = body.current_content
     const revisionInstruction: string | undefined = body.revision_instruction
+    const variationSeed: number | undefined = body.variation_seed
 
     if (!spaceId || !jobId) {
       return new Response(JSON.stringify({ error: 'space_id and job_id are required' }), { status: 400 })
@@ -440,6 +441,10 @@ Deno.serve(async (req) => {
     lines.push(contributionsXml)
     lines.push('')
     lines.push('Schrijf nu de collectieve eulogie. Omsluit je output in <toespraak> en <verantwoording> tags zoals beschreven.')
+
+    if (variationSeed !== undefined) {
+      lines.push(`\nSchrijf een versie die qua opening, opbouw en formulering duidelijk verschilt van een eventueel eerder gegenereerde versie op basis van dezelfde bijdragen. Varieer de structuur en de invalshoek. Variatiesleutel: ${variationSeed}`)
+    }
 
     const isRevision = !!(currentContent && revisionInstruction)
 
