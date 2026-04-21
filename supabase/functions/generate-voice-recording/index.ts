@@ -48,7 +48,6 @@ Deno.serve(async (req) => {
         text: recording.input_text,
         model_id: ELEVENLABS_MODEL,
         language_code: ELEVENLABS_LANGUAGE_CODE,
-        next_text: '',
         voice_settings: { stability: 0.75, similarity_boost: 0.75 },
       }),
     })
