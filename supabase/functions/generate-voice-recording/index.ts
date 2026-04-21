@@ -8,7 +8,7 @@ const supabase = createClient(
 
 const ELEVENLABS_API_KEY = Deno.env.get('ELEVENLABS_API_KEY')!
 const ELEVENLABS_MODEL = 'eleven_v3'
-const ELEVENLABS_LANGUAGE_CODE = 'nl'
+const ELEVENLABS_LANGUAGE_CODE = 'nld'
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
