@@ -47,14 +47,26 @@ Deno.serve(async (req) => {
 
   console.log(`[process-photo-webhook] artwork=${artworkId} status=${prediction.status}`)
 
+  const { data: artwork } = await supabase
+    .from('photo_artworks')
+    .select('original_storage_path')
+    .eq('id', artworkId)
+    .single()
+
+  const originalPath = artwork?.original_storage_path ?? null
+
+  async function removeOriginal() {
+    if (originalPath) await supabase.storage.from('photos').remove([originalPath])
+  }
+
   if (prediction.status === 'failed' || prediction.status === 'canceled') {
-    await supabase
-      .from('photo_artworks')
-      .update({
+    await Promise.all([
+      supabase.from('photo_artworks').update({
         status: 'failed',
         error_message: prediction.error ?? `Replicate prediction ${prediction.status}`,
-      })
-      .eq('id', artworkId)
+      }).eq('id', artworkId),
+      removeOriginal(),
+    ])
     return new Response('ok')
   }
 
@@ -64,29 +76,29 @@ Deno.serve(async (req) => {
 
   const outputUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output
   if (!outputUrl || typeof outputUrl !== 'string') {
-    await supabase
-      .from('photo_artworks')
-      .update({ status: 'failed', error_message: 'No output URL in prediction' })
-      .eq('id', artworkId)
+    await Promise.all([
+      supabase.from('photo_artworks').update({ status: 'failed', error_message: 'No output URL in prediction' }).eq('id', artworkId),
+      removeOriginal(),
+    ])
     return new Response('ok')
   }
 
   try {
     const resultPath = await uploadResultToStorage(artworkId, spaceId, outputUrl)
 
-    await supabase
-      .from('photo_artworks')
-      .update({ status: 'done', result_storage_path: resultPath })
-      .eq('id', artworkId)
+    await Promise.all([
+      supabase.from('photo_artworks').update({ status: 'done', result_storage_path: resultPath }).eq('id', artworkId),
+      removeOriginal(),
+    ])
 
     return new Response('ok')
 
   } catch (err) {
     console.error('[process-photo-webhook] error:', err)
-    await supabase
-      .from('photo_artworks')
-      .update({ status: 'failed', error_message: String(err) })
-      .eq('id', artworkId)
+    await Promise.all([
+      supabase.from('photo_artworks').update({ status: 'failed', error_message: String(err) }).eq('id', artworkId),
+      removeOriginal(),
+    ])
     return new Response('ok')
   }
 })

@@ -206,10 +206,10 @@ Deno.serve(async (req) => {
 
   } catch (err) {
     console.error('[process-photo] error:', err)
-    await supabase
-      .from('photo_artworks')
-      .update({ status: 'failed', error_message: String(err) })
-      .eq('id', artworkId)
+    await Promise.all([
+      supabase.from('photo_artworks').update({ status: 'failed', error_message: String(err) }).eq('id', artworkId),
+      supabase.storage.from('photos').remove([artwork.original_storage_path]),
+    ])
     return new Response(String(err), { status: 500 })
   }
 })
