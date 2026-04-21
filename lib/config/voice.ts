@@ -16,7 +16,7 @@ export const PRESET_VOICES: PresetVoice[] = [
 ]
 
 export const ELEVENLABS_MODEL = 'eleven_v3'
-export const ELEVENLABS_LANGUAGE_CODE = 'nld'
+export const ELEVENLABS_LANGUAGE_CODE = 'nl'
 
 // Maximum characters used for voice previews
 export const PREVIEW_MAX_CHARS = 300
