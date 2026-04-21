@@ -30,16 +30,36 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
     space.deceased_last_name,
   ].filter(Boolean).join(' ')
 
-  const { data: membership } = await supabase
-    .from('memorial_space_members')
-    .select('role')
-    .eq('memorial_space_id', id)
-    .eq('user_id', user.id)
-    .maybeSingle()
+  const [{ data: membership }, { data: primaryContactMember }] = await Promise.all([
+    supabase
+      .from('memorial_space_members')
+      .select('role')
+      .eq('memorial_space_id', id)
+      .eq('user_id', user.id)
+      .maybeSingle(),
+    supabase
+      .from('memorial_space_members')
+      .select('invited_name, invited_email, user_id')
+      .eq('memorial_space_id', id)
+      .eq('role', 'primary_contact')
+      .maybeSingle(),
+  ])
 
   const isPrimaryContact = membership?.role === 'primary_contact'
   const isDirector = space.created_by === user.id
   const canManageLink = isPrimaryContact || isDirector
+  const isFamilyMember = !isPrimaryContact && !isDirector
+
+  let primaryContactName: string = primaryContactMember?.invited_name ?? ''
+  if (!primaryContactName && primaryContactMember?.user_id) {
+    const { data: pcProfile } = await supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', primaryContactMember.user_id)
+      .single()
+    if (pcProfile?.display_name) primaryContactName = pcProfile.display_name
+  }
+  if (!primaryContactName) primaryContactName = primaryContactMember?.invited_email ?? 'de hoofdcontactpersoon'
 
   let token: string | null = null
   let shareUrl: string | null = null
@@ -48,7 +68,7 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
     shareUrl = `${process.env.APP_URL ?? ''}/contribute/${token}`
   }
 
-  const { data: contributions } = await supabase
+  const { data: contributions } = isFamilyMember ? { data: null } : await supabase
     .from('collective_eulogy_contributions')
     .select('id, contributor_name, relationship_to_deceased, answers_json, moderation_status, submitted_at')
     .eq('memorial_space_id', id)
@@ -64,6 +84,16 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
   const acceptedCount = (contributions ?? []).filter(c => c.moderation_status === 'accepted').length
   const pendingCount = (contributions ?? []).filter(c => c.moderation_status === 'pending').length
 
+  function ToelichtingPrimaryContact({ firstName }: { firstName: string }) {
+    return (
+      <Toelichting>
+        <p>Met deze tool stel je samen met familie en vrienden een gezamenlijk afscheidswoord op voor {firstName}.</p>
+        <p>Stuur een deellink naar naasten. Via die link kunnen zij hun herinneringen en gedachten over {firstName} achterlaten — anoniem of met naam. Je modereert de bijdragen en bepaalt welke worden meegenomen. Na-klank verweeft de geaccepteerde bijdragen daarna tot één samenhangende tekst.</p>
+        <p>Het resultaat kan achteraf nog worden bewerkt, opnieuw gegenereerd of worden verfijnd via een herziening-instructie.</p>
+      </Toelichting>
+    )
+  }
+
   function Shell({ children }: { children: React.ReactNode }) {
     return (
       <main className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FFF1E5' }}>
@@ -75,14 +105,19 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
             <h1 className="text-3xl text-black">Gezamenlijk afscheidswoord</h1>
             <p className="text-black text-sm mt-1">{fullName}</p>
           </div>
-          <Toelichting>
-            <p>Met deze tool stel je samen met familie en vrienden een gezamenlijk afscheidswoord op voor {firstName}.</p>
-            <p>Als primair contact stuur je een deellink naar naasten. Via die link kunnen zij hun herinneringen en gedachten over {firstName} achterlaten — anoniem of met naam. Je modereert de bijdragen en bepaalt welke worden meegenomen. Na-klank verweeft de geaccepteerde bijdragen daarna tot één samenhangende tekst.</p>
-            <p>Het resultaat kan achteraf nog worden bewerkt, opnieuw gegenereerd of worden verfijnd via een herziening-instructie.</p>
-          </Toelichting>
           {children}
         </div>
       </main>
+    )
+  }
+
+  if (isFamilyMember) {
+    return (
+      <Shell>
+        <p className="text-sm text-black">
+          {primaryContactName} kan het gezamenlijk afscheidswoord voor {firstName} in gang zetten.
+        </p>
+      </Shell>
     )
   }
 
@@ -99,6 +134,7 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
 
     return (
       <Shell>
+        <ToelichtingPrimaryContact firstName={firstName} />
         <CollectiveEulogyGenerating jobId={activeJob?.id ?? null} spaceId={id} isUpdate={!!collectiveEulogy.current_version_id} />
       </Shell>
     )
@@ -113,6 +149,7 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
 
     return (
       <Shell>
+        <ToelichtingPrimaryContact firstName={firstName} />
         <div className="space-y-10">
           <CollectiveEulogyEditor
             spaceId={id}
@@ -143,6 +180,7 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
 
   return (
     <Shell>
+      <ToelichtingPrimaryContact firstName={firstName} />
       <div className="space-y-8">
         {canManageLink && shareUrl && token && (
           <div>
