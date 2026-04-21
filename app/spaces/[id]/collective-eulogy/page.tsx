@@ -87,9 +87,9 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
   function ToelichtingPrimaryContact({ firstName }: { firstName: string }) {
     return (
       <Toelichting>
-        <p>Met deze tool stel je samen met familie en vrienden een gezamenlijk afscheidswoord op voor {firstName}.</p>
-        <p>Stuur een deellink naar naasten. Via die link kunnen zij hun herinneringen en gedachten over {firstName} achterlaten — anoniem of met naam. Je modereert de bijdragen en bepaalt welke worden meegenomen. Na-klank verweeft de geaccepteerde bijdragen daarna tot één samenhangende tekst.</p>
-        <p>Het resultaat kan achteraf nog worden bewerkt, opnieuw gegenereerd of worden verfijnd via een herziening-instructie.</p>
+        <p>Met deze tool stel je als familie, vrienden, kennissen een gezamenlijk afscheidswoord op voor {firstName}.</p>
+        <p>Stuur de deellink naar naasten. Via die link kunnen zij hun herinneringen en gedachten over {firstName} achterlaten — anoniem of met naam. Je modereert de bijdragen en bepaalt welke worden meegenomen. De geaccepteerde bijdragen worden daarna tot één samenhangende tekst verwerkt.</p>
+        <p>Het resultaat kan achteraf opnieuw worden gegenereerd, worden verfijnd via een herziening-instructie, of handmatig worden aangepast.</p>
       </Toelichting>
     )
   }
