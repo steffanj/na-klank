@@ -237,6 +237,24 @@ Gebruik actie "verwijder" als de zin niet gered kan worden. Gebruik actie "pas_a
 
 Wees precies en streng. Geef alleen echte problemen door — geen twijfels, geen stijlkritiek. Als je het niet met zekerheid kunt weerleggen, is het geen bevinding.`
 
+const LANGUAGE_CHECKER_SYSTEM_PROMPT = `Je controleert een Nederlandse toespraak uitsluitend op taal-, spel- en grammaticafouten.
+
+Jouw taak is strikt beperkt:
+- Corrigeer spelfouten, tikfouten en grammaticale fouten
+- Corrigeer inconsequent gebruik van hoofdletters, leestekens en koppeltekens waar dat duidelijk fout is
+- Corrigeer dt-fouten en andere werkwoordsvervoegingfouten
+
+Wat je NIET doet:
+- De inhoud aanpassen
+- Stijl of toon wijzigen
+- Zinnen herstructureren
+- Woorden vervangen door synoniemen
+- Iets toevoegen of weghalen
+
+Als er geen fouten zijn, geef je de tekst ongewijzigd terug.
+
+Begin direct met de (eventueel gecorrigeerde) tekst. Geen inleiding, geen uitleg, geen XML-tags.`
+
 const CORRECTOR_SYSTEM_PROMPT = `Je past een collectieve eulogie aan op basis van een lijst concrete bevindingen van een verificateur.
 
 Jouw taak:
@@ -246,6 +264,17 @@ Jouw taak:
 - Als het weghalen van een zin de omringende tekst onvloeiend maakt, pas je maximaal één of twee aangrenzende zinnen aan voor leesbaarheid — zonder nieuwe feiten toe te voegen
 
 Begin direct met de gecorrigeerde tekst. Geen inleiding, geen uitleg, geen XML-tags.`
+
+async function runLanguageCheck(speech: string, anthropicClient: Anthropic): Promise<string> {
+  const response = await anthropicClient.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 16384,
+    system: LANGUAGE_CHECKER_SYSTEM_PROMPT,
+    messages: [{ role: 'user', content: speech }],
+  })
+  const result = response.content[0].type === 'text' ? response.content[0].text.trim() : speech
+  return result || speech
+}
 
 type VerificationPass = {
   pass: number
@@ -453,7 +482,7 @@ Deno.serve(async (req) => {
       attributionAudit = extractXmlTag(rawOutput, 'verantwoording') || null
 
       const verified = await runVerificationLoop(initialSpeech, attributionAudit, contributionsXml, anthropic)
-      content = verified.speech
+      content = await runLanguageCheck(verified.speech, anthropic)
       verificationLog = verified.log
     }
 
