@@ -184,7 +184,8 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
               />
               <button
                 type="submit"
-                className="px-4 py-2.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors shrink-0"
+                className="px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black hover:border-stone-800 transition-colors shrink-0"
+                style={{ backgroundColor: '#FFF8F2' }}
               >
                 Uitnodigen
               </button>
