@@ -36,11 +36,9 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
   return (
     <main className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FFF1E5' }}>
       <div className="max-w-2xl mx-auto">
-        {space_id && (
-          <a href={`/spaces/${space_id}`} className="text-sm text-black hover:text-black mb-8 inline-block">
-            ← Terug
-          </a>
-        )}
+        <a href={space_id ? `/spaces/${space_id}` : '/'} className="text-sm text-black hover:text-black mb-8 inline-block">
+          ← Terug
+        </a>
         <div className="mb-8">
           <h1 className="text-3xl text-black">Contact</h1>
         </div>
