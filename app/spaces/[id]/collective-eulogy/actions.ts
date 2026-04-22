@@ -8,7 +8,7 @@ import { revalidatePath } from 'next/cache'
 function fireEdgeFunction(spaceId: string, jobId: string) {
   const admin = createAdminClient()
   admin.functions.invoke('synthesize-collective-eulogy', {
-    body: { space_id: spaceId, job_id: jobId },
+    body: { space_id: spaceId, job_id: jobId, variation_seed: Math.random() },
   }).catch((err) => console.error('[synthesize-collective-eulogy] invoke error:', err))
 }
 
@@ -263,6 +263,7 @@ export async function reviseCollectiveEulogy(formData: FormData) {
         job_id: job.id,
         current_content: currentContent,
         revision_instruction: revisionInstruction.trim(),
+        variation_seed: Math.random(),
       },
     }).catch(() => {})
   }
