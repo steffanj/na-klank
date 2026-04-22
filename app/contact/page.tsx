@@ -44,10 +44,12 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
         <div className="mb-8">
           <h1 className="text-3xl text-black">Contact</h1>
         </div>
-        <div className="mb-8 text-sm text-black space-y-1">
-          <p>Telefoon: <a href="tel:+31643004501" className="hover:underline">+316 4300 4501</a></p>
-          <p className="text-stone-500">Of stuur een bericht via het formulier:</p>
-        </div>
+        {user && (
+          <div className="mb-8 text-sm text-black space-y-1">
+            <p>Telefoon: <a href="tel:+31643004501" className="hover:underline">+316 4300 4501</a></p>
+            <p className="text-stone-500">Of stuur een bericht via het formulier:</p>
+          </div>
+        )}
         <ContactForm
           defaultName={userName}
           defaultEmail={userEmail}
