@@ -1,7 +1,8 @@
-import { Resend } from 'resend'
+import * as Brevo from '@getbrevo/brevo'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const brevo = new Brevo.TransactionalEmailsApi()
+brevo.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY ?? '')
 
 export async function sendInvite({
   email,
@@ -24,8 +25,6 @@ export async function sendInvite({
     throw new Error(linkError?.message ?? 'Kon geen uitnodigingslink aanmaken.')
   }
 
-  // Build invite URL using hashed_token so the callback can verify it server-side
-  // via verifyOtp — avoids PKCE code_verifier requirement from action_link flow
   const { hashed_token } = linkData.properties
   const next = new URL(redirectTo).searchParams.get('next') ?? '/'
   const inviteUrl = `${process.env.APP_URL}/auth/callback?token_hash=${hashed_token}&type=invite&next=${encodeURIComponent(next)}`
@@ -35,19 +34,21 @@ export async function sendInvite({
     return
   }
 
-  const { error: emailError } = await resend.emails.send({
-    from: process.env.RESEND_FROM ?? 'onboarding@resend.dev',
-    to: email,
-    subject: 'Je bent uitgenodigd voor Na-klank',
-    html: `
-      <p>Hallo${name ? ` ${name}` : ''},</p>
-      <p>Je bent uitgenodigd om deel te nemen aan een herdenkingsruimte op Na-klank.</p>
-      <p><a href="${inviteUrl}">Klik hier om je uitnodiging te accepteren</a></p>
-      <p>Deze link is 24 uur geldig.</p>
-    `,
-  })
+  const mail = new Brevo.SendSmtpEmail()
+  mail.sender = { name: 'Na-klank', email: process.env.BREVO_FROM ?? '' }
+  mail.to = [{ email, name: name ?? undefined }]
+  mail.subject = 'Je bent uitgenodigd voor Na-klank'
+  mail.htmlContent = `
+    <p>Hallo${name ? ` ${name}` : ''},</p>
+    <p>Je bent uitgenodigd om deel te nemen aan een herdenkingsruimte op Na-klank.</p>
+    <p><a href="${inviteUrl}">Klik hier om je uitnodiging te accepteren</a></p>
+    <p>Deze link is 24 uur geldig.</p>
+  `
 
-  if (emailError) {
-    throw new Error(`Gebruiker aangemaakt, maar e-mail kon niet worden verstuurd: ${emailError.message}`)
+  try {
+    await brevo.sendTransacEmail(mail)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw new Error(`Gebruiker aangemaakt, maar e-mail kon niet worden verstuurd: ${message}`)
   }
 }

@@ -19,10 +19,11 @@ type Props = {
   content: string
   status: string
   fullName: string
+  readOnly?: boolean
 }
 
 
-export default function CollectiveEulogyEditor({ spaceId, content, status, fullName }: Props) {
+export default function CollectiveEulogyEditor({ spaceId, content, status, fullName, readOnly = false }: Props) {
   const [text, setText] = useState(content)
   const [selectedPresets, setSelectedPresets] = useState<Set<string>>(new Set())
   const [freeInstruction, setFreeInstruction] = useState('')
@@ -54,7 +55,7 @@ export default function CollectiveEulogyEditor({ spaceId, content, status, fullN
   }, [text])
 
   useEffect(() => {
-    if (finalized || text === lastSavedText.current) return
+    if (finalized || readOnly || text === lastSavedText.current) return
     setSaveStatus('pending')
     const timer = setTimeout(async () => {
       setSaveStatus('saving')
@@ -82,6 +83,40 @@ export default function CollectiveEulogyEditor({ spaceId, content, status, fullN
       text,
       filename: `${fullName} — Gezamenlijk afscheidswoord.pdf`,
     })
+  }
+
+  if (readOnly) {
+    return (
+      <div>
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={() => {}}
+          disabled
+          rows={1}
+          className="w-full px-5 py-4 text-sm text-black border border-stone-300 rounded-xl leading-relaxed resize-none overflow-hidden mb-4"
+          style={{ backgroundColor: '#FFF8F2' }}
+        />
+        <div className="flex gap-3 flex-wrap">
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+            style={{ backgroundColor: '#FFF8F2' }}
+          >
+            {copied ? 'Gekopieerd' : 'Kopieer tekst'}
+          </button>
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="px-5 py-2.5 text-sm border border-stone-300 text-black rounded-lg hover:border-stone-400 transition-colors"
+            style={{ backgroundColor: '#FFF8F2' }}
+          >
+            Download
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -111,16 +111,6 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
     )
   }
 
-  if (isFamilyMember) {
-    return (
-      <Shell>
-        <p className="text-sm text-black">
-          {primaryContactName} kan het gezamenlijk afscheidswoord voor {firstName} in gang zetten.
-        </p>
-      </Shell>
-    )
-  }
-
   if (collectiveEulogy?.status === 'generating') {
     const { data: activeJob } = await supabase
       .from('generation_jobs')
@@ -156,6 +146,7 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
             content={version?.content ?? ''}
             status={collectiveEulogy.status}
             fullName={fullName}
+            readOnly={isFamilyMember}
           />
 
           {isPrimaryContact && (
@@ -174,6 +165,16 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
             </CollapsibleContributions>
           )}
         </div>
+      </Shell>
+    )
+  }
+
+  if (isFamilyMember) {
+    return (
+      <Shell>
+        <p className="text-sm text-black">
+          {primaryContactName} kan het gezamenlijk afscheidswoord voor {firstName} in gang zetten.
+        </p>
       </Shell>
     )
   }

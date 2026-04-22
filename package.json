@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@getbrevo/brevo": "^5.0.4",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.103.3",
     "jspdf": "^4.2.1",

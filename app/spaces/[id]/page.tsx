@@ -24,16 +24,16 @@ const MODULES = [
     href: (id: string) => `/spaces/${id}/collective-eulogy`,
   },
   {
+    key: 'voice',
+    label: 'Voorlezen',
+    description: 'Laat je afscheidswoord voorlezen in een vertrouwde stem.',
+    href: (id: string) => `/spaces/${id}/voice`,
+  },
+  {
     key: 'photo',
     label: "Foto's",
     description: "Upgrade de kwaliteit van oude foto's, laat zwart-wit-foto's inkleuren of vertaal foto's naar een kunstzinnige stijl.",
     href: (id: string) => `/spaces/${id}/photo`,
-  },
-  {
-    key: 'voice',
-    label: 'Voorlezen',
-    description: 'Laat je afscheidswoord voorlezen in een vertrouwde stem, of je eigen stem.',
-    href: (id: string) => `/spaces/${id}/voice`,
   },
 ]
 
