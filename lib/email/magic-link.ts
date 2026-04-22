@@ -24,16 +24,58 @@ export async function sendMagicLink({ email }: { email: string }) {
     return
   }
 
+  // Look up spaces associated with this email to personalize the email
+  const { data: memberships } = await admin
+    .from('memorial_space_members')
+    .select('invited_name, memorial_spaces(deceased_first_name, deceased_nickname, deceased_last_name)')
+    .eq('invited_email', email)
+
+  type SpaceRow = {
+    deceased_first_name: string
+    deceased_nickname: string | null
+    deceased_last_name: string
+  }
+
+  const rows = (memberships ?? []).map(m => {
+    const s = m.memorial_spaces
+    if (!s || Array.isArray(s)) return null
+    return { space: s as unknown as SpaceRow, invited_name: m.invited_name as string | null }
+  }).filter((r): r is { space: SpaceRow; invited_name: string | null } => r !== null)
+
+  const userName = rows[0]?.invited_name ?? null
+  const greeting = `Hallo${userName ? ` ${userName}` : ''},`
+
+  let subject: string
+  let body: string
+
+  if (rows.length === 1) {
+    const s = rows[0].space
+    const deceasedName = [
+      s.deceased_first_name,
+      s.deceased_nickname ? `"${s.deceased_nickname}"` : null,
+      s.deceased_last_name,
+    ].filter(Boolean).join(' ')
+    subject = 'Inloglink voor Na-klank herinneringsruimte'
+    body = `<p>${greeting}</p>
+      <p>Klik op de onderstaande link om in te loggen bij Na-klank voor toegang tot de herinneringsruimte van ${deceasedName}.</p>`
+  } else if (rows.length > 1) {
+    subject = 'Inloglink voor Na-klank herinneringsruimten'
+    body = `<p>${greeting}</p>
+      <p>Klik op de onderstaande link om in te loggen bij Na-klank voor toegang tot verschillende herinneringsruimten.</p>`
+  } else {
+    subject = 'Inloglink voor Na-klank'
+    body = `<p>${greeting}</p>
+      <p>Klik op de onderstaande link om in te loggen bij Na-klank.</p>`
+  }
+
   try {
     await brevo.transactionalEmails.sendTransacEmail({
       sender: { name: 'Na-klank', email: process.env.BREVO_FROM ?? '' },
       to: [{ email }],
-      subject: 'Inloglink voor Na-klank',
-      htmlContent: `
-        <p>Hallo,</p>
-        <p>Klik op de onderstaande link om in te loggen bij Na-klank.</p>
+      subject,
+      htmlContent: `${body}
         <p><a href="${magicUrl}">Inloggen</a></p>
-        <p>Deze link is 24 uur geldig en kan maar één keer worden gebruikt.</p>
+        <p>Deze link is 30 minuten geldig en kan maar één keer worden gebruikt.</p>
       `,
     })
   } catch (err: unknown) {
