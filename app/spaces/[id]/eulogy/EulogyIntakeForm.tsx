@@ -63,7 +63,8 @@ export default function EulogyIntakeForm({ eulogyId, spaceId, firstName, savedAn
 
       <button
         type="submit"
-        className="px-6 py-3 bg-stone-800 text-white text-sm rounded-lg hover:bg-stone-700 transition-colors"
+        className="px-6 py-3 text-sm rounded-lg border border-stone-300 text-black hover:border-stone-800 transition-colors"
+        style={{ backgroundColor: '#FFF8F2' }}
       >
         Stel afscheidswoord op
       </button>

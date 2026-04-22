@@ -174,7 +174,7 @@ export default function VoiceModule({
         <div className="flex flex-wrap gap-3 items-center mb-4">
           <button
             onClick={handlePreview}
-            className="px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black hover:border-stone-400 transition-colors"
+            className="px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black hover:border-stone-800 transition-colors"
             style={{ backgroundColor: '#FFF8F2' }}
           >
             {`Beluister preview — ${selectedVoiceLabel}`}
@@ -182,7 +182,8 @@ export default function VoiceModule({
           <button
             onClick={handleGenerate}
             disabled={generateState === 'submitting' || !activeText.trim()}
-            className="px-4 py-2.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors disabled:opacity-50"
+            className="px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black hover:border-stone-800 transition-colors disabled:opacity-50"
+            style={{ backgroundColor: '#FFF8F2' }}
           >
             {generateState === 'submitting' ? 'Genereren…' : 'Genereer volledige opname'}
           </button>
