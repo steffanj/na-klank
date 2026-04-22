@@ -1,8 +1,7 @@
-import * as Brevo from '@getbrevo/brevo'
+import { BrevoClient } from '@getbrevo/brevo'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const brevo = new Brevo.TransactionalEmailsApi()
-brevo.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY ?? '')
+const brevo = new BrevoClient({ apiKey: process.env.BREVO_API_KEY ?? '' })
 
 export async function sendMagicLink({ email }: { email: string }) {
   const admin = createAdminClient()
@@ -25,19 +24,18 @@ export async function sendMagicLink({ email }: { email: string }) {
     return
   }
 
-  const mail = new Brevo.SendSmtpEmail()
-  mail.sender = { name: 'Na-klank', email: process.env.BREVO_FROM ?? '' }
-  mail.to = [{ email }]
-  mail.subject = 'Inloglink voor Na-klank'
-  mail.htmlContent = `
-    <p>Hallo,</p>
-    <p>Klik op de onderstaande link om in te loggen bij Na-klank.</p>
-    <p><a href="${magicUrl}">Inloggen</a></p>
-    <p>Deze link is 24 uur geldig en kan maar één keer worden gebruikt.</p>
-  `
-
   try {
-    await brevo.sendTransacEmail(mail)
+    await brevo.transactionalEmails.sendTransacEmail({
+      sender: { name: 'Na-klank', email: process.env.BREVO_FROM ?? '' },
+      to: [{ email }],
+      subject: 'Inloglink voor Na-klank',
+      htmlContent: `
+        <p>Hallo,</p>
+        <p>Klik op de onderstaande link om in te loggen bij Na-klank.</p>
+        <p><a href="${magicUrl}">Inloggen</a></p>
+        <p>Deze link is 24 uur geldig en kan maar één keer worden gebruikt.</p>
+      `,
+    })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
     throw new Error(`E-mail kon niet worden verstuurd: ${message}`)

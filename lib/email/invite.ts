@@ -1,8 +1,7 @@
-import * as Brevo from '@getbrevo/brevo'
+import { BrevoClient } from '@getbrevo/brevo'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const brevo = new Brevo.TransactionalEmailsApi()
-brevo.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY ?? '')
+const brevo = new BrevoClient({ apiKey: process.env.BREVO_API_KEY ?? '' })
 
 export async function sendInvite({
   email,
@@ -34,19 +33,18 @@ export async function sendInvite({
     return
   }
 
-  const mail = new Brevo.SendSmtpEmail()
-  mail.sender = { name: 'Na-klank', email: process.env.BREVO_FROM ?? '' }
-  mail.to = [{ email, name: name ?? undefined }]
-  mail.subject = 'Je bent uitgenodigd voor Na-klank'
-  mail.htmlContent = `
-    <p>Hallo${name ? ` ${name}` : ''},</p>
-    <p>Je bent uitgenodigd om deel te nemen aan een herdenkingsruimte op Na-klank.</p>
-    <p><a href="${inviteUrl}">Klik hier om je uitnodiging te accepteren</a></p>
-    <p>Deze link is 24 uur geldig.</p>
-  `
-
   try {
-    await brevo.sendTransacEmail(mail)
+    await brevo.transactionalEmails.sendTransacEmail({
+      sender: { name: 'Na-klank', email: process.env.BREVO_FROM ?? '' },
+      to: [{ email, name: name ?? undefined }],
+      subject: 'Je bent uitgenodigd voor Na-klank',
+      htmlContent: `
+        <p>Hallo${name ? ` ${name}` : ''},</p>
+        <p>Je bent uitgenodigd om deel te nemen aan een herdenkingsruimte op Na-klank.</p>
+        <p><a href="${inviteUrl}">Klik hier om je uitnodiging te accepteren</a></p>
+        <p>Deze link is 24 uur geldig.</p>
+      `,
+    })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
     throw new Error(`Gebruiker aangemaakt, maar e-mail kon niet worden verstuurd: ${message}`)
