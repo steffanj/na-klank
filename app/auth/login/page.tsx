@@ -69,7 +69,8 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors disabled:opacity-50"
+            className="w-full py-3 text-sm border border-stone-300 rounded-lg text-black hover:border-stone-800 transition-colors disabled:opacity-50"
+            style={{ backgroundColor: '#FFF8F2' }}
           >
             {loading ? 'Bezig...' : 'Stuur inloglink'}
           </button>
