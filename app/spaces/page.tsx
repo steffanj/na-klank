@@ -12,21 +12,21 @@ export default async function SpacesOverviewPage() {
     .eq('user_id', user.id)
     .not('accepted_at', 'is', null)
 
+  type SpaceRow = {
+    id: string
+    deceased_first_name: string
+    deceased_nickname: string | null
+    deceased_last_name: string
+    funeral_date: string | null
+  }
+
   const spaces = (memberships ?? [])
-    .map(m => m.memorial_spaces as {
-      id: string
-      deceased_first_name: string
-      deceased_nickname: string | null
-      deceased_last_name: string
-      funeral_date: string | null
-    } | null)
-    .filter(Boolean) as {
-      id: string
-      deceased_first_name: string
-      deceased_nickname: string | null
-      deceased_last_name: string
-      funeral_date: string | null
-    }[]
+    .map(m => {
+      const s = m.memorial_spaces
+      if (!s || Array.isArray(s)) return null
+      return s as unknown as SpaceRow
+    })
+    .filter((s): s is SpaceRow => s !== null)
 
   if (spaces.length === 1) {
     redirect(`/spaces/${spaces[0].id}`)
