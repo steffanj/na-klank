@@ -188,10 +188,10 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, fullN
                   key={preset.key}
                   type="button"
                   onClick={() => togglePreset(preset.key)}
-                  className={`px-3 py-1.5 text-xs rounded-lg border-2 transition-colors text-black ${
+                  className={`px-3 py-1.5 text-xs rounded-lg border transition-colors text-black ${
                     selectedPresets.has(preset.key)
-                      ? 'border-stone-700 hover:border-stone-700'
-                      : 'border-stone-200 hover:border-stone-400'
+                      ? 'border-stone-800 hover:border-stone-800'
+                      : 'border-stone-300 hover:border-stone-400'
                   }`}
                   style={{ backgroundColor: '#FFF8F2' }}
                 >

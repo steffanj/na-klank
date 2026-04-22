@@ -76,10 +76,10 @@ export default function PhotoUpload({ spaceId }: { spaceId: string }) {
               key={tool.style || tool.category}
               type="button"
               onClick={() => setSelectedTool(tool)}
-              className={`text-left px-4 py-3 rounded-xl border-2 transition-colors ${
+              className={`text-left px-4 py-3 rounded-xl border transition-colors ${
                 isSelected
-                  ? 'border-stone-700 hover:border-stone-700'
-                  : 'border-stone-200 hover:border-stone-400'
+                  ? 'border-stone-800 hover:border-stone-800'
+                  : 'border-stone-300 hover:border-stone-400'
               }`}
               style={{ backgroundColor: '#FFF1E5' }}
             >
@@ -97,10 +97,10 @@ export default function PhotoUpload({ spaceId }: { spaceId: string }) {
               key={s.key}
               type="button"
               onClick={() => setArtisticStyle(s.key)}
-              className={`px-3 py-1.5 text-xs rounded-lg border-2 transition-colors text-black ${
+              className={`px-3 py-1.5 text-xs rounded-lg border transition-colors text-black ${
                 artisticStyle === s.key
-                  ? 'border-stone-700 hover:border-stone-700'
-                  : 'border-stone-200 hover:border-stone-400'
+                  ? 'border-stone-800 hover:border-stone-800'
+                  : 'border-stone-300 hover:border-stone-400'
               }`}
               style={{ backgroundColor: '#FFF1E5' }}
             >

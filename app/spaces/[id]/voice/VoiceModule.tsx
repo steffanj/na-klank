@@ -114,10 +114,10 @@ export default function VoiceModule({
             <button
               key={s.key}
               onClick={() => setSelectedSource(s.key)}
-              className={`px-4 py-2 text-sm rounded-lg border-2 transition-colors text-black ${
+              className={`px-4 py-2 text-sm rounded-lg border transition-colors text-black ${
                 selectedSource === s.key
-                  ? 'border-stone-700 hover:border-stone-700'
-                  : 'border-stone-200 hover:border-stone-400'
+                  ? 'border-stone-800 hover:border-stone-800'
+                  : 'border-stone-300 hover:border-stone-400'
               }`}
               style={{ backgroundColor: '#FFF8F2' }}
             >
@@ -153,9 +153,9 @@ export default function VoiceModule({
             <button
               key={voice.id}
               onClick={() => selectVoice(voice.id)}
-              className={`px-3 py-2.5 text-left rounded-lg border-2 transition-colors ${
+              className={`px-3 py-2.5 text-left rounded-lg border transition-colors ${
                 selectedVoiceId === voice.id
-                  ? 'border-stone-700 hover:border-stone-700'
+                  ? 'border-stone-800 hover:border-stone-800'
                   : 'border-stone-200 text-black hover:border-stone-400'
               }`}
               style={{ backgroundColor: '#FFF8F2' }}
