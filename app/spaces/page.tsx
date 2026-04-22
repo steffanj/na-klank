@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Footer from '@/app/components/Footer'
 
 export default async function SpacesOverviewPage() {
   const supabase = await createClient()
@@ -71,14 +72,7 @@ export default async function SpacesOverviewPage() {
           </div>
         )}
 
-        <div className="mt-16 flex justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
-            <circle cx="32" cy="32" r="4" fill="#2C3E50"/>
-            <circle cx="32" cy="32" r="11" fill="none" stroke="#2C3E50" strokeWidth="1.5" opacity="0.75"/>
-            <circle cx="32" cy="32" r="19" fill="none" stroke="#2C3E50" strokeWidth="1.5" opacity="0.45"/>
-            <circle cx="32" cy="32" r="27" fill="none" stroke="#2C3E50" strokeWidth="1.5" opacity="0.2"/>
-          </svg>
-        </div>
+        <Footer />
       </div>
     </main>
   )
