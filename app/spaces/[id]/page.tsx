@@ -70,7 +70,7 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
 
   const { data: myMembership } = await supabase
     .from('memorial_space_members')
-    .select('role')
+    .select('role, invited_name')
     .eq('memorial_space_id', id)
     .eq('user_id', user.id)
     .maybeSingle()
@@ -114,7 +114,7 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
         <h2 className="text-base text-black border-b border-stone-300 pb-2 mb-4 flex items-center justify-between">
           Modules
           <div className="flex items-center gap-3">
-            <span className="text-xs text-black">Ingelogd als: {profile?.display_name || user.email}</span>
+            <span className="text-xs text-black">Ingelogd als: {myMembership?.invited_name || profile?.display_name || user.email}</span>
             <form action={logout} className="inline-flex">
               <button type="submit" className="text-xs text-black hover:underline">
                 Uitloggen
