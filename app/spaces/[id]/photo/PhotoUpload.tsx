@@ -76,17 +76,15 @@ export default function PhotoUpload({ spaceId }: { spaceId: string }) {
               key={tool.style || tool.category}
               type="button"
               onClick={() => setSelectedTool(tool)}
-              className={`text-left px-4 py-3 rounded-xl border transition-colors ${
+              className={`text-left px-4 py-3 rounded-xl border-2 transition-colors ${
                 isSelected
-                  ? 'border-stone-800 bg-stone-800 text-white'
-                  : 'border-stone-300 text-black hover:border-stone-400'
+                  ? 'border-stone-700 hover:border-stone-700'
+                  : 'border-stone-200 hover:border-stone-400'
               }`}
-              style={isSelected ? {} : { backgroundColor: '#FFF1E5' }}
+              style={{ backgroundColor: '#FFF1E5' }}
             >
-              <p className="text-sm font-medium">{tool.label}</p>
-              <p className={`text-xs mt-1 leading-relaxed ${isSelected ? 'text-stone-300' : 'text-stone-500'}`}>
-                {tool.description}
-              </p>
+              <p className="text-sm font-medium text-black">{tool.label}</p>
+              <p className="text-xs mt-1 leading-relaxed text-stone-500">{tool.description}</p>
             </button>
           )
         })}
@@ -99,12 +97,12 @@ export default function PhotoUpload({ spaceId }: { spaceId: string }) {
               key={s.key}
               type="button"
               onClick={() => setArtisticStyle(s.key)}
-              className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+              className={`px-3 py-1.5 text-xs rounded-lg border-2 transition-colors text-black ${
                 artisticStyle === s.key
-                  ? 'bg-stone-600 text-white border-stone-600'
-                  : 'border-stone-300 text-black hover:border-stone-400'
+                  ? 'border-stone-700 hover:border-stone-700'
+                  : 'border-stone-200 hover:border-stone-400'
               }`}
-              style={artisticStyle === s.key ? {} : { backgroundColor: '#FFF1E5' }}
+              style={{ backgroundColor: '#FFF1E5' }}
             >
               {s.label}
             </button>
