@@ -59,22 +59,6 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/director/dashboard`)
   }
 
-  // Family member: go to first accepted space
-  if (pending && pending.length > 0) {
-    return NextResponse.redirect(`${origin}/spaces/${pending[0].memorial_space_id}`)
-  }
-
-  const { data: membership } = await supabase
-    .from('memorial_space_members')
-    .select('memorial_space_id')
-    .eq('user_id', user.id)
-    .not('accepted_at', 'is', null)
-    .limit(1)
-    .single()
-
-  if (membership) {
-    return NextResponse.redirect(`${origin}/spaces/${membership.memorial_space_id}`)
-  }
-
-  return NextResponse.redirect(`${origin}/`)
+  // Family member: go to spaces overview (handles single-space auto-redirect there)
+  return NextResponse.redirect(`${origin}/spaces`)
 }
