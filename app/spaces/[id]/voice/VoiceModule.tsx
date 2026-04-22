@@ -114,12 +114,12 @@ export default function VoiceModule({
             <button
               key={s.key}
               onClick={() => setSelectedSource(s.key)}
-              className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
+              className={`px-4 py-2 text-sm rounded-lg border-2 transition-colors text-black ${
                 selectedSource === s.key
-                  ? 'bg-stone-800 text-white border-stone-800'
-                  : 'border-stone-300 text-black hover:border-stone-400'
+                  ? 'border-stone-700 hover:border-stone-700'
+                  : 'border-stone-200 hover:border-stone-400'
               }`}
-              style={selectedSource !== s.key ? { backgroundColor: '#FFF8F2' } : undefined}
+              style={{ backgroundColor: '#FFF8F2' }}
             >
               {s.label}
             </button>
@@ -153,17 +153,15 @@ export default function VoiceModule({
             <button
               key={voice.id}
               onClick={() => selectVoice(voice.id)}
-              className={`px-3 py-2.5 text-left rounded-lg border transition-colors ${
+              className={`px-3 py-2.5 text-left rounded-lg border-2 transition-colors ${
                 selectedVoiceId === voice.id
-                  ? 'bg-stone-800 text-white border-stone-800'
-                  : 'border-stone-300 text-black hover:border-stone-400'
+                  ? 'border-stone-700 hover:border-stone-700'
+                  : 'border-stone-200 text-black hover:border-stone-400'
               }`}
-              style={selectedVoiceId !== voice.id ? { backgroundColor: '#FFF8F2' } : undefined}
+              style={{ backgroundColor: '#FFF8F2' }}
             >
-              <p className="text-sm">{voice.name}</p>
-              <p className={`text-xs mt-0.5 ${selectedVoiceId === voice.id ? 'text-stone-300' : 'text-stone-500'}`}>
-                {voice.description}
-              </p>
+              <p className="text-sm text-black">{voice.name}</p>
+              <p className="text-xs mt-0.5 text-stone-500">{voice.description}</p>
             </button>
           ))}
         </div>
