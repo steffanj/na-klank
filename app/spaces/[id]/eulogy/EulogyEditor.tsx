@@ -216,7 +216,8 @@ export default function EulogyEditor({ eulogyId, spaceId, content, status, fullN
                 <button
                   type="submit"
                   disabled={!combinedInstruction}
-                  className="px-5 py-2.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                  className="px-5 py-2.5 text-sm border border-stone-300 rounded-lg text-black hover:border-stone-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                  style={{ backgroundColor: '#FFF8F2' }}
                 >
                   Pas toe
                 </button>
