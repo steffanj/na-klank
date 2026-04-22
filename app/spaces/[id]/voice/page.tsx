@@ -59,6 +59,16 @@ export default async function VoicePage({ params }: { params: Promise<{ id: stri
     }
   }
 
+  // Check if user is primary contact
+  const { data: myMembership } = await supabase
+    .from('memorial_space_members')
+    .select('role')
+    .eq('memorial_space_id', id)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  const isPrimaryContact = myMembership?.role === 'primary_contact'
+
   // Load collective eulogy if ready
   const { data: collectiveEulogy } = await admin
     .from('collective_eulogies')
@@ -75,7 +85,7 @@ export default async function VoicePage({ params }: { params: Promise<{ id: stri
       .select('content')
       .eq('id', collectiveEulogy.current_version_id)
       .single()
-    if (version) collectiveEulogyText = version.content
+    if (version && isPrimaryContact) collectiveEulogyText = version.content
   }
 
   // Load cloned voices for this space
