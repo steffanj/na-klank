@@ -42,7 +42,7 @@ export async function sendInvite({
         <p>Hallo${name ? ` ${name}` : ''},</p>
         <p>Je bent uitgenodigd om deel te nemen aan een herdenkingsruimte op Na-klank.</p>
         <p><a href="${inviteUrl}">Klik hier om je uitnodiging te accepteren</a></p>
-        <p>Deze link is 24 uur geldig.</p>
+        <p>Deze link is 30 minuten geldig.</p>
       `,
     })
   } catch (err: unknown) {
