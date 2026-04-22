@@ -106,6 +106,14 @@ export default async function CollectiveEulogyPage({ params }: { params: Promise
             <p className="text-black text-sm mt-1">{fullName}</p>
           </div>
           {children}
+          <div className="mt-16 flex justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+              <circle cx="32" cy="32" r="4" fill="#2C3E50"/>
+              <circle cx="32" cy="32" r="11" fill="none" stroke="#2C3E50" strokeWidth="1.5" opacity="0.75"/>
+              <circle cx="32" cy="32" r="19" fill="none" stroke="#2C3E50" strokeWidth="1.5" opacity="0.45"/>
+              <circle cx="32" cy="32" r="27" fill="none" stroke="#2C3E50" strokeWidth="1.5" opacity="0.2"/>
+            </svg>
+          </div>
         </div>
       </main>
     )

@@ -101,6 +101,15 @@ export default async function PhotoPage({ params }: { params: Promise<{ id: stri
             Nog geen foto's verwerkt. Kies een tool hierboven en upload een foto.
           </p>
         )}
+
+        <div className="mt-16 flex justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+            <circle cx="32" cy="32" r="4" fill="#2C3E50"/>
+            <circle cx="32" cy="32" r="11" fill="none" stroke="#2C3E50" strokeWidth="1.5" opacity="0.75"/>
+            <circle cx="32" cy="32" r="19" fill="none" stroke="#2C3E50" strokeWidth="1.5" opacity="0.45"/>
+            <circle cx="32" cy="32" r="27" fill="none" stroke="#2C3E50" strokeWidth="1.5" opacity="0.2"/>
+          </svg>
+        </div>
       </div>
     </main>
   )
