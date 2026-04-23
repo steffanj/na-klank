@@ -166,13 +166,13 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
               ))}
             </div>
 
-            <form action={addFamilyMember} className="flex gap-2">
+            <form action={addFamilyMember} className="flex flex-col sm:flex-row gap-2">
               <input type="hidden" name="space_id" value={id} />
               <input
                 name="name"
                 type="text"
                 placeholder="Voornaam"
-                className="w-36 px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-stone-400"
+                className="sm:w-36 px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-stone-400"
                 style={{ backgroundColor: '#FFF8F2' }}
               />
               <input
@@ -180,12 +180,12 @@ export default async function SpaceHubPage({ params }: { params: Promise<{ id: s
                 type="email"
                 required
                 placeholder="familielid@email.nl"
-                className="flex-1 px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-stone-400"
+                className="sm:flex-1 px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-stone-400"
                 style={{ backgroundColor: '#FFF8F2' }}
               />
               <button
                 type="submit"
-                className="px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black hover:border-stone-800 transition-colors shrink-0"
+                className="px-4 py-2.5 text-sm border border-stone-300 rounded-lg text-black hover:border-stone-800 transition-colors"
                 style={{ backgroundColor: '#FFF8F2' }}
               >
                 Uitnodigen
